@@ -107,6 +107,8 @@ doc_events = {
 
 fixtures = ["Custom Field"]
 
+additional_signup_fields = "school.templates.signup_fields.html"
+
 # Testing
 # -------
 

@@ -13,7 +13,10 @@
   "mentor_request_status_update",
   "search_settings_section",
   "show_search",
-  "search_placeholder"
+  "search_placeholder",
+  "signup_settings_section",
+  "show_country",
+  "verify_age"
  ],
  "fields": [
   {
@@ -65,12 +68,29 @@
    "fieldname": "search_placeholder",
    "fieldtype": "Data",
    "label": "Search Field Placeholder"
+  },
+  {
+   "fieldname": "signup_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Signup Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_country",
+   "fieldtype": "Check",
+   "label": "Show Country dropdown during Signup"
+  },
+  {
+   "default": "0",
+   "fieldname": "verify_age",
+   "fieldtype": "Check",
+   "label": "Verify Age during Signup"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2021-11-25 14:12:21.514922",
+ "modified": "2021-12-14 17:32:06.171308",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Settings",

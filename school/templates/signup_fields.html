@@ -1,0 +1,34 @@
+{% set countries = frappe.db.get_all("Country", pluck="name") %}
+{% set show_country = frappe.db.get_single_value("LMS Settings", "show_country") %}
+{% set verify_age = frappe.db.get_single_value("LMS Settings", "verify_age") %}
+
+{% if show_country %}
+<div class="form-group">
+  <div class="control-input-wrapper">
+    <div class="control-input flex align-center">
+      <select type="text" autocomplete="off" data-fieldtype="Select" data-fieldname="country"
+        class="input-with-feedback form-control ellipsis bold" id="signup-country" required>
+      <option value="">Your Country</option>
+      {% for country in countries %}
+      <option value="{{ country }}"> {{ country }} </option>
+      {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if verify_age %}
+<div class="form-group">
+  <div class="checkbox">
+    <label>
+      <span class="input-area">
+        <input type="checkbox" autocomplete="off" class="input-with-feedback"
+          data-fieldtype="Check" data-fieldname="age" id="signup-age" required>
+        </span>
+      <span class="label-area">I confirm that I am 18 years old or above</span>
+    </label>
+    <p class="help-box small text-muted"></p>
+  </div>
+</div>
+{% endif %}
