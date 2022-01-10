@@ -7,7 +7,7 @@
   <div class="container">
   <a class="button is-primary pull-right" href="/job-opportunity">{{ _("Post a Job") }}</a>
   <div class="course-home-headings">{{ _("Job Openings") }}</div>
-    <div class="cards-parent">
+    <div class="job-card-parent">
       {% for job in jobs %}
         <div class="common-card-style course-card">
           <div class="job-card">
@@ -18,11 +18,14 @@
               </div>
               <div class="job-card-info">
                 <div class="bold-title">{{ _(job.job_title) }}</div>
-                <small>{{ job.company_name }}</small>
+                <div>{{ job.company_name }}</div>
+                <div>{{ frappe.utils.format_date(job.creation, "medium") }}</div>
               </div>
             </div>
-            <div class="avatar avatar-large" title="{{ job.company_name}}">
-              <span class="avatar-frame company-logo" style="background-image: url( {{ job.company_logo | urlencode }} );"></span>
+            <div class="">
+              <div class="avatar avatar-large" title="{{ job.company_name}}">
+                <span class="avatar-frame company-logo" style="background-image: url( {{ job.company_logo | urlencode }} );"></span>
+              </div>
             </div>
           </div>
           <a class="stretched-link" href="/jobs/{{ job.name }}"></a>

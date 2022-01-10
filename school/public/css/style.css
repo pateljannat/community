@@ -63,9 +63,8 @@ input[type=checkbox] {
   text-align: center;
   letter-spacing: 0.011em;
   text-transform: uppercase;
-  color: #2C5477;
   font-weight: bold;
-  box-shadow: 0px 5px 10px rgb(0 0 0 / 10%);
+  box-shadow: var(--shadow-sm);
 }
 
 .dark-pills {
@@ -78,7 +77,6 @@ input[type=checkbox] {
 }
 
 .common-page-style {
-  background: #F4F5F6;
   padding-bottom: 5rem;
   min-height: 60vh;
   padding-top: 3rem;
@@ -87,19 +85,19 @@ input[type=checkbox] {
 .common-card-style {
   display: flex;
   background: #FFFFFF;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   position: relative;
-  border: 1px solid #EEF0F2;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--card-shadow);
+  padding: 1rem;
 }
 
 .course-card {
   flex-direction: column;
+  padding: 0;
 }
 
 .muted-text {
-  font-size: 12px;
-  line-height: 135%;
+  font-size: 0.75rem;
 }
 
 .course-card-meta {
@@ -139,7 +137,7 @@ input[type=checkbox] {
 
 .card-divider {
   border-top: 1px solid #EEF0F2;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 
 .card-divider-dark {
@@ -275,7 +273,6 @@ input[type=checkbox] {
 }
 
 .review-content {
-  padding: 24px;
   flex: 1;
 }
 
@@ -321,11 +318,9 @@ input[type=checkbox] {
 .course-card-wide {
   display: flex;
   flex-direction: row;
-  padding: 24px;
-  background: #E2E6E9;
-  border-radius: 8px;
-  margin-top: 16px;
-  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.02), 0px 0px 8px rgba(0, 0, 0, 0.04);
+  padding: 0;
+  margin-top: 1rem;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
@@ -348,10 +343,9 @@ input[type=checkbox] {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  margin-right: 32px;
-  border-radius: 8px;
+  margin-right: 2rem;
+  border-radius: var(--border-radius-md);
   flex: 1;
-  align-self: center;
 }
 
 @media (max-width: 768px) {
@@ -431,7 +425,7 @@ input[type=checkbox] {
 
 .button {
   box-shadow: var(--btn-shadow);
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -496,24 +490,13 @@ input[type=checkbox] {
   margin-top: 3rem;
 }
 
-.small-title {
-  letter-spacing: -0.011em;
-}
-
 .chapter-title {
   font-weight: bold;
-  margin: 0 .25rem 0;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  padding-bottom: 1rem;
 }
 
 .chapter-description {
   height: fit-content;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-bottom: 0.75rem;
 }
 
 .course-content-parent .chapter-description {
@@ -590,24 +573,22 @@ input[type=checkbox] {
 }
 
 .lesson-info {
-  font-size: 16px;
   line-height: 250%;
-  letter-spacing: -0.011em;
+  padding-top: 0.5rem;
 }
 
 .lesson-links {
   display: flex;
-  padding: 0 1rem;
-  margin-bottom: .25rem;
+  padding: 0 0.25rem;
   color: inherit;
 }
 
 .lesson-links:hover {
   cursor: pointer;
   text-decoration: none;
-  background: #F4F5F6;
+  background: var(--gray-100);
   color: inherit;
-  border-radius: .25rem;
+  border-radius: var(--border-radius-sm);
 }
 
 .course-content-parent .lesson-links {
@@ -618,17 +599,12 @@ input[type=checkbox] {
 }
 
 .chapter-content {
-  margin: 0;
-  margin-left: .875rem;
+  margin-left: 1rem;
 }
 
 .course-outline {
   flex-direction: column;
-  padding: 1rem 0.75rem 0;
-}
-
-.lessons {
-  margin-bottom: 1rem;
+  padding: 1rem;
 }
 
 .course-buttons {
@@ -642,7 +618,6 @@ input[type=checkbox] {
 }
 
 .member-card {
-  display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1rem 0;
@@ -771,7 +746,6 @@ input[type=checkbox] {
 }
 
 .description-card {
-  padding: 1.5rem;
   flex-direction: column;
 }
 
@@ -784,7 +758,6 @@ input[type=checkbox] {
 }
 
 .overview-card {
-  padding: 1.5rem;
   flex-direction: column;
   display: grid;
   -moz-column-gap: 1rem;
@@ -955,7 +928,7 @@ input[type=checkbox] {
 }
 
 .active-lesson {
-  background-color: #EBF5FF;
+  background-color: var(--blue-50);
   border-radius: 0.25rem;
 }
 
@@ -1345,7 +1318,6 @@ pre {
 
 .testimonial-card {
   flex-direction: column;
-  padding: 1rem;
   height: 100%;
   margin-right: 0.25rem;
   margin-bottom: 0.5rem;
@@ -1494,4 +1466,9 @@ pre {
 .company-logo {
   background-position: left;
   background-size: 88px;
+}
+
+.job-card-parent {
+  display: grid;
+  row-gap: 1rem;
 }

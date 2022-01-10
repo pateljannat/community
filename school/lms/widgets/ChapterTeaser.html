@@ -1,8 +1,8 @@
 <div>
 
-  <div class="chapter-title small-title" data-target="#{{ course.get_slugified_chapter_title(chapter.title) }}"
+  <div class="chapter-title" data-target="#{{ course.get_slugified_chapter_title(chapter.title) }}"
     data-toggle="collapse" aria-expanded="false">
-    <img class="chapter-icon" src="/assets/school/icons/chevron-right.svg">
+    <!-- <img class="chapter-icon" src="/assets/school/icons/chevron-right.svg"> -->
     {{ index }}. {{ chapter.title }}
   </div>
 
@@ -19,10 +19,10 @@
 
       {% for lesson in course.get_lessons(chapter) %}
 
-      <div class="lesson-info {% if membership.current_lesson == lesson.name %} active-lesson {% endif %}">
+      <div class="lesson-info">
 
         {% if membership or lesson.include_in_preview %}
-        <a class="lesson-links" href="{{ course.get_learn_url(lesson.number) }}{{course.query_parameter}}"
+        <a class="lesson-links {% if membership.current_lesson == lesson.name %} active-lesson {% endif %}" href="{{ course.get_learn_url(lesson.number) }}{{course.query_parameter}}"
           data-course="{{ course.name }}">
           {{ lesson.title }}
 
@@ -85,20 +85,20 @@
   var expand_the_active_chapter = () => {
 
     /* Find anchor matching the URL for course details page */
-    var selector = $(`a[href="${decodeURIComponent(window.location.pathname)}"]`).parent();
-    if (!selector.length) {
+    var selector = $(`a[href="${decodeURIComponent(window.location.pathname)}"]`);
+    /* if (!selector.length) {
       selector = $(`a[href^="${decodeURIComponent(window.location.pathname)}"]`).parent();
-    }
+    } */
     if (selector.length && $(".course-details-page").length) {
-      $(".lesson-info").removeClass("active-lesson")
+      $(".lesson-links").removeClass("active-lesson")
       selector.addClass("active-lesson");
-      show_section(selector.parent().parent());
+      show_section(selector.parent().parent().parent());
     }
 
     /* For course home page */
     else if ($(".active-lesson").length) {
       selector = $(".active-lesson")
-      show_section(selector.parent().parent());
+      show_section(selector.parent().parent().parent());
     }
 
     /* If no active chapter then exapand the first chapter */

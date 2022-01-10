@@ -13,8 +13,8 @@
   {% if reviews | length %}
   <div class="reviews-section">
     {% for review in reviews %}
-    <div class="review-card">
-      <div class="common-card-style review-content small-title"> {{ review.review }} </div>
+    <div class="common-card-style review-card">
+      <div class="review-content"> {{ review.review }} </div>
       <div class="review-card-footer">
         <div>
           {{ widgets.Avatar(member=review.owner_details, avatar_class="avatar-medium") }}

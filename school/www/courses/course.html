@@ -129,7 +129,10 @@
   <div class="course-home-headings">
     Creator
   </div>
-  {{ widgets.MemberCard(member=course.get_instructor(), show_course_count=True, dimension_class="member-card-large") }}
+  {% set authored_courses = course.get_instructor().get_authored_courses() | length %}
+  {% set suffix = " Courses " if authored_courses > 1 else " Course " %}
+  {% set course_line = frappe.utils.cstr(authored_courses) + suffix + "Created" if authored_courses > 0 else False %}
+  {{ widgets.MemberCard(member=course.get_instructor(), course_line=course_line, avatar_class="avatar-xl") }}
 </div>
 {% endmacro %}
 
@@ -142,7 +145,7 @@
     Your Progress
   </div>
   <div class="common-card-style progress-card">
-    <p class="small-title">
+    <p class="">
       {% if progress != 100 %}
       Great work so far!
       {% else %}
@@ -190,7 +193,7 @@
   <div class="course-home-headings">
     Overview
   </div>
-  <div class="common-card-style overview-card small-title">
+  <div class="common-card-style overview-card">
     {% if course.get_students() | length %}
     <div class="overview-item">
       <img class="icon-background mr-1" src="/assets/school/icons/user.svg" />
@@ -218,7 +221,7 @@
   </div>
   <div class="member-parent">
     {% for mentor in course.get_mentors() %}
-    {{ widgets.MemberCard(member=mentor, show_course_count=False, dimension_class="") }}
+    {{ widgets.MemberCard(member=mentor, course_line=False) }}
     {% endfor %}
   </div>
   <div class="view-all-mentors">
