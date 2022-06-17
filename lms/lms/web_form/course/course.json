@@ -20,7 +20,7 @@
  "is_standard": 1,
  "login_required": 1,
  "max_attachment_size": 0,
- "modified": "2022-03-11 12:32:22.512115",
+ "modified": "2022-06-16 21:27:26.197792",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "course",
@@ -33,7 +33,7 @@
  "show_in_grid": 0,
  "show_sidebar": 0,
  "sidebar_items": [],
- "success_url": "/course",
+ "success_url": "",
  "title": "Course",
  "web_form_fields": [
   {

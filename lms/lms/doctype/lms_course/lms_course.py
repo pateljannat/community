@@ -203,3 +203,7 @@ def submit_for_review(course):
         return "No Chp"
     frappe.db.set_value("LMS Course", course, "status", "Under Review")
     return "OK"
+
+@frappe.whitelist()
+def get_course_name(title):
+    return frappe.db.get_value("LMS Course", {"title": title, "owner": frappe.session.user}, "name")
