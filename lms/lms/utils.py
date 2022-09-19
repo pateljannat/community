@@ -460,3 +460,8 @@ def get_certificates(member=None):
     return frappe.get_all("LMS Certificate", {
         "member": member or frappe.session.user
     }, ["course", "member", "issue_date", "expiry_date", "name"])
+
+
+def can_create_course():
+    portal_course_creation = frappe.db.get_single_value("LMS Settings", "portal_course_creation")
+    return frappe.session.user != "Guest" and (portal_course_creation == "Anyone" or has_course_instructor_role())

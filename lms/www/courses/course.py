@@ -1,6 +1,7 @@
 import frappe
 from lms.lms.doctype.lms_settings.lms_settings import check_profile_restriction
-from lms.lms.utils import get_membership, has_course_moderator_role, is_instructor, is_certified, get_evaluation_details, redirect_to_courses_list
+from lms.lms.utils import get_membership, has_course_moderator_role, is_instructor, is_certified, get_evaluation_details, redirect_to_courses_list, can_create_course
+from frappe import _
 
 def get_context(context):
     context.no_cache = 1
@@ -11,8 +12,6 @@ def get_context(context):
         redirect_to_courses_list()
 
     if course_name == "new-course":
-        if frappe.session.user == "Guest":
-            redirect_to_courses_list()
         context.course = frappe._dict()
         context.course.edit_mode = True
         context.membership = None

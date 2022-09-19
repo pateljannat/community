@@ -1,5 +1,17 @@
 frappe.ready(() => {
 
+    if ($("#description").length) {
+        make_editor();
+    }
+
+    if (window.location.pathname.includes("/new-course") && frappe.session.user == "Guest") {
+        let link = `<a href="/login?redirect-to=/courses/new-course>"> ${__("log in")} </a>`;
+        frappe.throw({
+            "title": __("Log In"),
+            "message": __("Please {0} to create a course.", [link])
+        });
+    }
+
     hide_wrapped_mentor_cards();
 
     $("#cancel-request").click((e) => {
@@ -69,10 +81,6 @@ frappe.ready(() => {
     $(".btn-delete-tag").click((e) => {
         remove_tag(e);
     });
-
-    if ($("#description").length) {
-        make_editor();
-    }
 
 });
 

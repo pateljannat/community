@@ -8,7 +8,7 @@ import json
 from ...utils import generate_slug
 from frappe.utils import flt, cint
 from lms.lms.utils import get_chapters
-
+from frappe import _
 
 class LMSCourse(Document):
 
@@ -170,7 +170,7 @@ def reindex_exercises(doc):
     course_data = json.loads(doc)
     course = frappe.get_doc("LMS Course", course_data['name'])
     course.reindex_exercises()
-    frappe.msgprint("All exercises in this course have been re-indexed.")
+    frappe.msgprint(_("All exercises in this course have been re-indexed."))
 
 
 @frappe.whitelist(allow_guest=True)
