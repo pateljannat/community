@@ -10,7 +10,8 @@
   "member_name",
   "column_break_3",
   "issue_date",
-  "expiry_date"
+  "expiry_date",
+  "image"
  ],
  "fields": [
   {
@@ -52,11 +53,16 @@
    "fieldtype": "Data",
    "label": "Member Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-06 11:49:36.077370",
+ "modified": "2022-09-20 14:35:01.511887",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Certificate",

@@ -6,8 +6,12 @@
   <div class="container certificate-page">
 
     {% if certificate.member == frappe.session.user %}
-    <div class="button is-secondary pull-right" id="export-as-pdf" data-certificate="{{ certificate.name }}"
-        data-certificate-name="{{ member.full_name }} - {{ course.title }}">{{ _("Export") }}</div>
+    <div class="pull-right" id="cta-parent" data-certificate="{{ certificate.name }}"
+        data-certificate-name="{{ member.full_name }} - {{ course.title }}">
+        <div class="btn btn-sm btn-secondary" id="export-as-png">{{ _("Export as PNG") }}</div>
+        <div class="btn btn-sm btn-secondary ml-2" id="export-as-pdf">{{ _("Export as PDF") }}</div>
+    </div>
+
     {% endif %}
 
     <div class="breadcrumb">
@@ -15,11 +19,18 @@
         <img class="ml-1 mr-1" src="/assets/lms/icons/chevron-right.svg">
         <a class="dark-links" href="/courses/{{ course.name }}">{{ course.title }}</a>
     </div>
-    {% if custom_template %}
-        {{ custom_template }}
-    {% else %}
-        {% include "lms/templates/certificate.html" %}
-    {% endif %}
+
+    <div id="certificate-parent" data-name="{{ certificate.name }}">
+
+    </div>
+    <div id="certificate-html">
+        {% if custom_template %}
+            {{ custom_template }}
+        {% else %}
+            {% include "lms/templates/certificate.html" %}
+        {% endif %}
+    </div>
+
     <script src="/assets/lms/js/html2canvas.js"></script>
 
   </div>
