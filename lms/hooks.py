@@ -151,7 +151,8 @@ website_route_rules = [
 	{"from_route": "/courses/<course>/subgroups/<cohort>/<subgroup>/<page>", "to_route": "cohorts/subgroup"},
 	{"from_route": "/courses/<course>/join/<cohort>/<subgroup>/<invite_code>", "to_route": "cohorts/join"},
 	{"from_route": "/users", "to_route": "profiles/profile"},
-    {"from_route": "/jobs/<job>", "to_route": "jobs/job"}
+    {"from_route": "/jobs/<job>", "to_route": "jobs/job"},
+    {"from_route": "/get-started", "to_route": "get_started"}
 ]
 
 website_redirects = [
@@ -261,3 +262,5 @@ profile_url_prefix = "/users/"
 signup_form_template = "lms.plugins.show_custom_signup"
 
 on_login = "lms.overrides.user.set_country_from_ip"
+
+setup_wizard_requires = "assets/lms/js/setup_wizard.js"

@@ -584,3 +584,14 @@ def get_chart_data(chart_name, timespan, timegrain, from_date, to_date):
         ],
         "datasets": [{"name": chart.name, "values": [r[1] for r in result]}],
     }
+
+
+@frappe.whitelist()
+def get_onboarding_status():
+    return {
+        "is_onboarded": frappe.db.get_single_value("LMS Settings", "onboarding_complete"),
+        "course_created": bool(frappe.db.a_row_exists("LMS Course")),
+        "chapter_created": bool(frappe.db.a_row_exists("Course Chapter")),
+        "lesson_created": bool(frappe.db.a_row_exists("Course Lesson")),
+        "quiz_created": bool(frappe.db.a_row_exists("LMS Quiz")),
+    }

@@ -11,6 +11,7 @@
   "column_break_2",
   "custom_certificate_template",
   "livecode_url",
+  "onboarding_complete",
   "signup_settings_section",
   "terms_of_use",
   "terms_page",
@@ -137,12 +138,18 @@
    "fieldtype": "Link",
    "label": "Custom Certificate Template",
    "options": "Web Template"
+  },
+  {
+   "default": "0",
+   "fieldname": "onboarding_complete",
+   "fieldtype": "Check",
+   "label": "Onboarding Complete"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-10-11 16:26:15.898514",
+ "modified": "2022-10-18 15:12:10.890380",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Settings",
