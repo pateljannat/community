@@ -622,15 +622,17 @@ def show_start_learing_cta(course, membership):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_chart_data(chart_name, timespan, timegrain, from_date, to_date):
+def get_chart_data(chart_name, timespan, timegrain, from_date, to_date, custom_filters=None):
+	filters = []
 	chart = frappe.get_doc("Dashboard Chart", chart_name)
-	filters = [([chart.document_type, "docstatus", "<", 2, False])]
 	doctype = chart.document_type
 	datefield = chart.based_on
 	value_field = chart.value_based_on or "1"
 	from_date = get_datetime(from_date).strftime("%Y-%m-%d")
 	to_date = get_datetime(to_date)
 
+	filters.append(frappe.parse_json(custom_filters))
+	filters.append([chart.document_type, "docstatus", "<", 2, False])
 	filters.append([doctype, datefield, ">=", from_date, False])
 	filters.append([doctype, datefield, "<=", to_date, False])
 

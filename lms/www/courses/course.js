@@ -1,4 +1,5 @@
 frappe.ready(() => {
+
 	hide_wrapped_mentor_cards();
 
 	$("#cancel-request").click((e) => {

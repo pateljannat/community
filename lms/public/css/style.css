@@ -60,7 +60,7 @@ input[type=checkbox] {
     font-weight: 600;
     color: var(--gray-900);
     width: fit-content;
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-300);
 }
 
 .dark-pills {
@@ -76,6 +76,10 @@ input[type=checkbox] {
   padding: 2rem 0 5rem;
   padding-top: 3rem;
   background-color: var(--bg-color);
+}
+
+.page-style {
+	padding: 3rem 0 5rem;
 }
 
 .common-card-style {
@@ -297,11 +301,11 @@ input[type=checkbox] {
 }
 
 .course-card-wide-title {
-  font-weight: 700;
-  font-size: var(--text-4xl);
-  line-height: 44px;
-  color: var(--gray-900);
-  margin: 0.25rem 0;
+	font-weight: 700;
+	font-size: var(--text-4xl);
+	line-height: 44px;
+	color: var(--gray-900);
+	margin: 0.25rem 0;
 }
 
 .button {
@@ -364,12 +368,11 @@ input[type=checkbox] {
 }
 
 .course-home-page .course-home-outline {
-    padding-bottom: 4rem;
+    padding-bottom: 2.5rem;
 }
 
 .course-home-page {
-  background-color: #FFFFFF;
-  padding-top: 4rem;
+	padding-top: 4rem;
 }
 
 .chapter-title {
@@ -444,7 +447,7 @@ input[type=checkbox] {
   font-size: var(--text-3-5xl);
   letter-spacing: -0.0175em;
   color: var(--gray-900);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .modal-headings {
@@ -1216,9 +1219,11 @@ pre {
 }
 
 .preview-video {
-  width: 100%;
-  height: 190px;
-  border: none;
+	width: 100%;
+	height: 400px;
+	border-radius: var(--border-radius-lg);
+	border: none;
+	margin-bottom: 2.5rem;
 }
 
 .course-body-container {
@@ -1312,10 +1317,10 @@ pre {
 }
 
 .avg-rating-stars {
-  background: var(--gray-200);
-  border-radius: 100px;
-  padding: 0.5rem 0.75rem;
-  margin: 1.25rem 0 0.5rem;
+	background: var(--gray-200);
+	border-radius: 100px;
+	padding: 0.5rem 0.75rem;
+	margin: 0.5rem 0;
 }
 
 .reviews-parent .progress {
@@ -1771,11 +1776,15 @@ li {
 .frappe-chart .title {
     font-size: 1rem;
     font-weight: bold;
-    color: var(--gray-900);
+    fill: var(--gray-900);
+}
+
+.course-home-page .frappe-chart .title {
+	font-size: var(--text-3-5xl);
 }
 
 .course-description-section {
-    padding-bottom: 4rem;
+    padding-bottom: 2.5rem;
 }
 
 input::file-selector-button {
@@ -1798,4 +1807,24 @@ input::file-selector-button:hover {
 select {
     appearance: none;
     -webkit-appearance: none;
+}
+
+.course-grid {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	grid-gap: 3rem;
+}
+
+.course-stats {
+	color: var(--primary-color);
+	font-size: 2rem;
+	font-weight: 500;
+}
+
+.course-stats-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 1.25rem;
+	width: 40%;
+	justify-content: space-between;
 }

@@ -78,7 +78,7 @@
                         <use class="" href="#{{ lesson.icon }}">
                     </svg>
 
-                    <span>{{ lesson.title }}</span>
+                    <span class="medium">{{ lesson.title }}</span>
 
                     {% if membership %}
                     <svg class="icon icon-sm lesson-progress-tick {{ get_progress(course.name, lesson.name) != 'Complete' and 'hide' }}">

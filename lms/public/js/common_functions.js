@@ -1,4 +1,5 @@
 frappe.ready(() => {
+
 	setup_file_size();
 
 	$(".join-batch").click((e) => {
@@ -16,6 +17,21 @@ frappe.ready(() => {
 	$(document).on("click", ".btn-save-chapter", (e) => {
 		save_chapter(e);
 	});
+
+	if ($("#new-signups").length) {
+		generate_graph("New Signups", "#new-signups");
+	}
+
+	if ($("#enrollments").length) {
+		generate_graph("Course Enrollments", "#enrollments");
+	}
+
+	if ($("#course-enrollments").length) {
+		generate_graph("Course Enrollments", "#course-enrollments", {
+			"course": $("#course-enrollments").data("course")
+		});
+	}
+
 });
 
 const setup_file_size = () => {
@@ -154,4 +170,44 @@ const save_chapter = (e) => {
 			}, 1000);
 		},
 	});
+};
+
+
+const generate_graph = (chart_name, element, filters) => {
+	let date = frappe.datetime;
+	console.log(filters)
+	frappe.call({
+		method: "lms.lms.utils.get_chart_data",
+		args: {
+			chart_name: chart_name,
+			timespan: "Select Date Range",
+			timegrain: "Daily",
+			from_date: date.add_days(date.get_today(), -30),
+			to_date: date.add_days(date.get_today(), +1),
+			custom_filters: filters
+		},
+		callback: (data) => {
+			render_chart(data.message, element, chart_name);
+		},
+	});
+};
+
+const render_chart = (data, element, chart_name) => {
+	const chart = new frappe.Chart(element, {
+		title: chart_name,
+		data: data,
+		type: "line",
+		height: 250,
+		colors: ["#4563f1"],
+		axisOptions: {
+			xIsSeries: 1,
+		},
+		lineOptions: {
+			regionFill: 1,
+		},
+	});
+
+	setTimeout(() => {
+		$(".frappe-chart .title").attr("x", 0);
+	}, 1000);
 };
