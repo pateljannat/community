@@ -38,7 +38,7 @@
                         <a class="button is-primary mr-2" href="{{ application_link }}"> {{ _("Apply") }} </a>
                         <div class="button is-default mr-2" id="report" data-job="{{ job.name }}"> {{ _("Report") }} </div>
                         {% if job.owner == frappe.session.user %}
-                        <a class="button is-default button-links" href="/job-opportunity?name={{ job.name }}"> {{ _("Edit") }} </a>
+                        <a class="button is-default button-links" href="/job-opportunity/{{ job.name }}/edit"> {{ _("Edit") }} </a>
                         {% endif %}
                     </div>
 
