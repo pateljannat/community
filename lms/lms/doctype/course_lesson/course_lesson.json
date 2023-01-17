@@ -20,7 +20,6 @@
   "quiz_id",
   "section_break_16",
   "question",
-  "column_break_15",
   "file_type",
   "section_break_11",
   "body",
@@ -66,7 +65,7 @@
   },
   {
    "fieldname": "body",
-   "fieldtype": "Markdown Editor",
+   "fieldtype": "Text Editor",
    "ignore_xss_filter": 1,
    "label": "Body",
    "reqd": 1
@@ -118,24 +117,20 @@
   {
    "description": "Assignment will appear at the bottom of the lesson.",
    "fieldname": "question",
-   "fieldtype": "Small Text",
+   "fieldtype": "Text Editor",
    "label": "Question"
   },
   {
    "fieldname": "file_type",
    "fieldtype": "Select",
-   "label": "File Type",
+   "label": "Assignment File Type",
    "mandatory_depends_on": "question",
    "options": "\nImage\nDocument\nPDF"
-  },
-  {
-   "fieldname": "column_break_15",
-   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-28 16:01:42.191123",
+ "modified": "2023-01-17 15:26:20.113397",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "Course Lesson",

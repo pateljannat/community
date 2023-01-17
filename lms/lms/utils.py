@@ -281,6 +281,7 @@ def render_html(lesson):
 	text = youtube + body + quiz_id
 
 	if lesson.question:
+		print(lesson.question)
 		assignment = "{{ Assignment('" + lesson.question + "-" + lesson.file_type + "') }}"
 		text = text + assignment
 
