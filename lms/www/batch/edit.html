@@ -1,0 +1,13 @@
+{% extends "lms/templates/lms_base.html" %}
+
+{% block title %}
+{{ lesson.title if lesson and lesson.title else _("New Lesson") }}
+{% endblock %}
+
+{% block page_content %}
+<main class="lms-page-style">
+    <div class="container">
+
+    </div>
+</main>
+{% endblock %}

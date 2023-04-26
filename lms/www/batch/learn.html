@@ -3,11 +3,7 @@
 
 
 {% block title %}
-{% if lesson.title %}
 {{ lesson.title }} - {{ course.title }}
-{% else %}
-{{ _("New Lesson") }}
-{% endif %}
 {% endblock %}
 
 
