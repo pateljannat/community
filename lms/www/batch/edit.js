@@ -392,3 +392,26 @@ class Upload {
 		};
 	}
 }
+
+class Embed {
+	static get toolbox() {
+		return {
+			title: "Embed",
+			icon: `<img src="/assets/lms/icons/embed.svg" width="15" height="15">`,
+		};
+	}
+
+	constructor({ data }) {
+		this.data = data;
+	}
+
+	render() {
+		this.wrapper = document.createElement("div");
+		if (this.data && this.data.embed) {
+			$(this.wrapper).html(this.render_embed(this.data.embed));
+		} else {
+			this.render_embed_dialog();
+		}
+		return this.wrapper;
+	}
+}
