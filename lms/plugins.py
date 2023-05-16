@@ -157,6 +157,16 @@ def assignment_renderer(detail):
 	)
 
 
+def list_renderer(list):
+	list = list.split(",")
+	print(list, type(list))
+	list_template = ""
+	for idx, item in enumerate(list):
+		list_template += f"{idx+1}. {item}<br>"
+	print(list_template)
+	return list_template
+
+
 def show_custom_signup():
 	if frappe.db.get_single_value(
 		"LMS Settings", "terms_of_use"

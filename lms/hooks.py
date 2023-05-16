@@ -281,6 +281,7 @@ lms_markdown_macro_renderers = {
 	"YouTubeVideo": "lms.plugins.youtube_video_renderer",
 	"Video": "lms.plugins.video_renderer",
 	"Assignment": "lms.plugins.assignment_renderer",
+	"List": "lms.plugins.list_renderer",
 }
 
 # page_renderer to manage profile pages

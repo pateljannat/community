@@ -28,6 +28,8 @@ const setup_editor = () => {
 					<use class="" href="#icon-header"></use>
 				</svg>`,
 			},
+			list: List,
+			check: Checklist,
 			paragraph: {
 				class: Paragraph,
 				inlineToolbar: true,
@@ -64,6 +66,13 @@ const parse_string_to_lesson = () => {
 				type: "quiz",
 				data: {
 					quiz: quiz,
+				},
+			});
+		} else if (block.includes == "{{ List") {
+			lesson_blocks.push({
+				type: "quiz",
+				data: {
+					items: block.match(/\b\w+\b/g),
 				},
 			});
 		} else if (block.includes("{{ Video")) {
@@ -106,6 +115,8 @@ const parse_string_to_lesson = () => {
 
 const save_lesson = (e) => {
 	self.editor.save().then((outputData) => {
+		console.log("Article data: ", outputData);
+		debugger;
 		parse_lesson_to_string(outputData);
 	});
 };
@@ -125,6 +136,8 @@ const parse_lesson_to_string = (data) => {
 		} else if (block.type == "header") {
 			lesson_content +=
 				"#".repeat(block.data.level) + ` ${block.data.text}\n`;
+		} else if (block.type == "list") {
+			lesson_content += `{{ List(${block.data.items.join(",")}) }}\n`;
 		} else if (block.type == "paragraph") {
 			lesson_content += `${block.data.text}\n`;
 		}
@@ -390,28 +403,5 @@ class Upload {
 			file_url: this.data.file_url || this.file_url,
 			is_video: this.is_video,
 		};
-	}
-}
-
-class Embed {
-	static get toolbox() {
-		return {
-			title: "Embed",
-			icon: `<img src="/assets/lms/icons/embed.svg" width="15" height="15">`,
-		};
-	}
-
-	constructor({ data }) {
-		this.data = data;
-	}
-
-	render() {
-		this.wrapper = document.createElement("div");
-		if (this.data && this.data.embed) {
-			$(this.wrapper).html(this.render_embed(this.data.embed));
-		} else {
-			this.render_embed_dialog();
-		}
-		return this.wrapper;
 	}
 }
