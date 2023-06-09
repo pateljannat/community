@@ -1,6 +1,8 @@
 frappe.ready(() => {
-	frappe.telemetry.capture("on_lesson_creation_page", "lms");
 	let self = this;
+	frappe.telemetry.capture("on_lesson_creation_page", "lms");
+	setup_frappe_vue();
+
 	if ($("#current-lesson-content").length) {
 		parse_string_to_lesson();
 	}
@@ -12,6 +14,11 @@ frappe.ready(() => {
 		save_lesson(e);
 	});
 });
+
+const setup_frappe_vue = () => {
+	Vue.prototype.__ = window.__;
+	Vue.prototype.frappe = window.frappe;
+};
 
 const setup_editor = () => {
 	self.editor = new EditorJS({

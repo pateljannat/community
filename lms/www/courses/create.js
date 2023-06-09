@@ -1,5 +1,7 @@
 frappe.ready(() => {
 	frappe.telemetry.capture("on_course_creation_page", "lms");
+	setup_frappe_vue();
+
 	$(".tags").click((e) => {
 		e.preventDefault();
 		$("#tags-input").focus();
@@ -42,6 +44,11 @@ frappe.ready(() => {
 		upload_file(e);
 	});
 });
+
+const setup_frappe_vue = () => {
+	Vue.prototype.__ = window.__;
+	Vue.prototype.frappe = window.frappe;
+};
 
 const create_tag = (e) => {
 	if ($(e.target).val() == "") {

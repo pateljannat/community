@@ -733,3 +733,8 @@ def is_onboarding_complete():
 		if course_created
 		else None,
 	}
+
+
+def get_rounding_method():
+	rounding_method = frappe.get_system_settings("rounding_method") or "Banker's Rounding"
+	return {"rounding_method": rounding_method}
