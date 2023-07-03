@@ -15,6 +15,8 @@ be loaded in a webpage.
 """
 
 import frappe
+from urllib.parse import quote
+from frappe import _
 
 
 class PageExtension:
@@ -101,21 +103,36 @@ def set_mandatory_fields_for_profile():
 
 
 def quiz_renderer(quiz_name):
+	if frappe.session.user == "Guest":
+		return " <div class='alert alert-info'>" + _(
+			"Quiz is not available to Guest users. Please login to continue."
+		)
+		+"</div>"
+
 	quiz = frappe.get_doc("LMS Quiz", quiz_name)
-
-	context = {"quiz": quiz}
-
 	no_of_attempts = frappe.db.count(
 		"LMS Quiz Submission", {"owner": frappe.session.user, "quiz": quiz_name}
 	)
 
-	if quiz.max_attempts and no_of_attempts >= quiz.max_attempts:
-		last_attempt_score = frappe.db.get_value(
-			"LMS Quiz Submission", {"owner": frappe.session.user, "quiz": quiz_name}, ["score"]
-		)
+	all_submissions = frappe.get_all(
+		"LMS Quiz Submission",
+		{
+			"quiz": quiz.name,
+			"member": frappe.session.user,
+		},
+		["name", "score", "creation"],
+		order_by="creation desc",
+	)
 
-		context.update({"attempts_exceeded": True, "last_attempt_score": last_attempt_score})
-	return frappe.render_template("templates/quiz.html", context)
+	return frappe.render_template(
+		"templates/quiz/quiz.html",
+		{
+			"quiz": quiz,
+			"no_of_attempts": no_of_attempts,
+			"all_submissions": all_submissions,
+			"hide_quiz": False,
+		},
+	)
 
 
 def exercise_renderer(argument):
@@ -138,7 +155,9 @@ def youtube_video_renderer(video_id):
 
 
 def video_renderer(src):
-	return f"<video controls width='100%'><source src={src} type='video/mp4'></video>"
+	return (
+		f"<video controls width='100%'><source src={quote(src)} type='video/mp4'></video>"
+	)
 
 
 def assignment_renderer(detail):

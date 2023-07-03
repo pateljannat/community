@@ -34,22 +34,45 @@
 	<div class="page-title">
 		{{ class_info.title }}
 	</div>
-	<div class="mt-1">
-		<svg class="icon icon-sm">
-			<use href="#icon-calendar"></use>
-		</svg>
-		<span>
-			{{ frappe.utils.format_date(class_info.start_date, "long") }} -
-		</span>
-		<span>
-			{{ frappe.utils.format_date(class_info.end_date, "long") }}
-		</span>
-	</div>
+
 	{% if class_info.description %}
-	<div class="mt-1">
+	<div class="mb-4">
 		{{ class_info.description }}
 	</div>
 	{% endif %}
+
+	<div class="vertically-center">
+		<div class="">
+			<svg class="icon icon-sm">
+				<use href="#icon-calendar"></use>
+			</svg>
+			<span>
+				{{ frappe.utils.format_date(class_info.start_date, "long") }} -
+			</span>
+			<span>
+				{{ frappe.utils.format_date(class_info.end_date, "long") }}
+			</span>
+		</div>
+
+		<span class="seperator"></span>
+
+		<div class="">
+			<svg class="icon icon-md">
+				<use href="#icon-education"></use>
+			</svg>
+				{{ class_courses | length }} {{ _("Courses") }}
+		</div>
+
+		<span class="seperator"></span>
+
+		<div class="">
+			<svg class="icon icon-md">
+				<use href="#icon-users"></use>
+			</svg>
+				{{ class_students | length }} {{ _("Students") }}
+		</div>
+	</div>
+
 
 	{% if class_info.custom_component %}
 		{{ class_info.custom_component }}
@@ -87,10 +110,24 @@
 			</a>
 		</li>
 
+		{% if is_moderator %}
+		<li class="nav-item">
+			<a class="nav-link" data-toggle="tab" href="#assessments">
+				{{ _("Assessments") }}
+				<span class="course-list-count">
+					{{ assessments | length }}
+				</span>
+			</a>
+		</li>
+		{% endif %}
+
 		{% if class_students | length and (is_moderator or is_student) %}
 		<li class="nav-item">
 			<a class="nav-link" data-toggle="tab" href="#live-class">
 				{{ _("Live Class") }}
+				<span class="course-list-count">
+					{{ live_classes | length }}
+				</span>
 			</a>
 		</li>
 		{% endif %}
@@ -107,6 +144,12 @@
 		<div class="tab-pane" id="students" role="tabpanel" aria-labelledby="students">
 			{{ StudentsSection(class_info, class_students) }}
 		</div>
+
+		{% if is_moderator %}
+		<div class="tab-pane" id="assessments" role="tabpanel" aria-labelledby="assessments">
+			{{ AssessmentsSection(class_info) }}
+		</div>
+		{% endif %}
 
 		{% if class_students | length and (is_moderator or is_student) %}
 		<div class="tab-pane" id="live-class" role="tabpanel" aria-labelledby="live-class">
@@ -135,20 +178,17 @@
 	</header>
 
 	{% if class_courses | length %}
-	<div>
+	<div class="cards-parent">
 		{% for course in class_courses %}
-		<div class="list-row level">
-			<div {% if is_moderator %} class="clickable" {% endif %}>
-				{{ course.title }}
-			</div>
-			{% if is_moderator %}
-			<div type="button" class="btn-remove-course" data-course="{{ course.course }}">
+		<div>
+			{{ widgets.CourseCard(course=course, read_only=False) }}
+			<button class="btn icon-btn btn-default btn-block btn-remove-course" data-course="{{ course.name }}">
 				<svg class="icon icon-sm">
 					<use href="#icon-delete"></use>
 				</svg>
-			</div>
-			{% endif %}
+			</button>
 		</div>
+
 		{% endfor %}
 	</div>
 	{% else %}
@@ -157,9 +197,7 @@
 	</div>
 	{% endif %}
 
-
 </article>
-
 {% endmacro %}
 
 
@@ -179,33 +217,134 @@
 	</header>
 
 	{% if class_students | length %}
-	<div>
+	<div class="form-grid">
+		<div class="grid-heading-row">
+			<div class="grid-row">
+				<div class="data-row row">
+					<div class="col grid-static-col">
+						{{ _("Full Name") }}
+					</div>
+					<div class="col grid-static-col col-xs-2 text-right">
+						{{ _("Courses Completed") }}
+					</div>
+					<div class="col grid-static-col col-xs-2 text-right">
+						{{ _("Assessments Completed") }}
+					</div>
+					<div class="col grid-static-col col-xs-2 text-right">
+						{{ _("Assessments Graded") }}
+					</div>
+					<div class="col grid-static-col">
+						{{ _("Last Active") }}
+					</div>
+					{% if is_moderator %}
+					<div class="col grid-static-col col-xs-1">
+						<svg class="icon icon-sm" style="filter: opacity(0.5)">
+							<use class="" href="#icon-setting-gear"></use>
+						</svg>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
 		{% for student in class_students %}
-		{% set last_active = frappe.db.get_value("User", student.student, "last_active") %}
-		{% set allow_progress = is_moderator or student.student == frappe.session.user or (frappe.db.get_single_value("LMS Settings", "allow_student_progress") and
-		is_student) %}
-
-		<div class="list-row level">
-			<div>
-				<a {% if allow_progress %} class="clickable" href="/classes/{{ class_info.name }}/students/{{ student.username }}" {% endif %}>
+		{% set allow_progress = is_moderator or student.student == frappe.session.user %}
+		<div class="grid-row">
+			<div class="data-row row">
+				<a class="col grid-static-col {% if allow_progress %} clickable {% endif %}" {% if allow_progress %} href="/classes/{{ class_info.name }}/students/{{ student.username }}" {% endif %}>
 					{{ student.student_name }}
 				</a>
+				<div class="col grid-static-col col-xs-2 text-right">
+					{{ student.courses_completed }}
+				</div>
+				<div class="col grid-static-col col-xs-2 text-right">
+					{{ student.assessments_completed }}
+				</div>
+				<div class="col grid-static-col col-xs-2 text-right">
+					{{ student.assessments_graded }}
+				</div>
+				<div class="col grid-static-col">
+					{{ frappe.utils.pretty_date(student.last_active) }}
+				</div>
+				{% if is_moderator %}
+				<div type="button" class="col grid-static-col col-xs-1 btn-remove-student" data-student="{{ student.student }}">
+					<svg class="icon icon-sm">
+						<use href="#icon-delete"></use>
+					</svg>
+				</div>
+				{% endif %}
 			</div>
-			{% if is_moderator %}
-			<div type="button" class="btn-remove-student" data-student="{{ student.student }}">
-				<svg class="icon icon-sm">
-					<use href="#icon-delete"></use>
-				</svg>
-			</div>
-			{% endif %}
 		</div>
-
 		{% endfor %}
 	</div>
 	{% else %}
 	<p class="text-muted mt-3"> {{ _("No Students") }} </p>
 	{% endif %}
 </article>
+{% endmacro %}
+
+
+{% macro AssessmentsSection(class_info) %}
+<article>
+	<header class="edit-header mb-5">
+		<div class="bold-heading">
+			{{ _("Assessments") }}
+		</div>
+		{% if is_moderator %}
+		<button class="btn btn-default btn-sm" id="open-assessment-modal">
+			{{ _("Manage Assessments") }}
+		</button>
+		{% endif %}
+	</header>
+	{{ AssessmentList(assessments) }}
+</article>
+{% endmacro %}
+
+{% macro AssessmentList(assessments) %}
+{% if assessments | length %}
+	<div class="form-grid">
+		<div class="grid-heading-row">
+			<div class="grid-row">
+				<div class="row data-row">
+					<div class="col grid-static-col">
+						{{ _("Title") }}
+					</div>
+					<div class="col grid-static-col">
+						{{ _("Type") }}
+					</div>
+					<div class="col grid-static-col col-xs-1">
+						<svg class="icon icon-sm" style="filter: opacity(0.5)">
+							<use href="#icon-setting-gear"></use>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="grid-body">
+			<div class="rows">
+				{% for assessment in assessments %}
+					<div class="grid-row">
+						<div class="row data-row">
+							<a class="col grid-static-col clickable" href="{{ assessment.edit_url }}">
+								{{ assessment.title }}
+							</a>
+							<div class="col grid-static-col">
+								{{ assessment.assessment_type.split("LMS ")[1] }}
+							</div>
+							<div type="button" class="col grid-static-col col-xs-1 btn-remove-assessment" data-assessment="{{ assessment.assessment_name }}">
+								<svg class="icon icon-sm">
+									<use href="#icon-delete"></use>
+								</svg>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	{% else %}
+	<p class="text-muted mt-3"> {{ _("No Assessments") }} </p>
+	{% endif %}
 {% endmacro %}
 
 
@@ -228,9 +367,7 @@
 
 
 {% macro CreateLiveClass(class_info) %}
-
 {% if is_moderator %}
-
 <div class="modal fade live-class-modal" id="live-class-modal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -257,7 +394,6 @@
 	</div>
 </div>
 {% endif %}
-
 {% endmacro %}
 
 
@@ -265,65 +401,66 @@
 <div class="lms-card-parent mt-5">
 	{% if live_classes | length %}
 	{% for class in live_classes %}
-	<div class="lms-card">
+		<div class="common-card-style column-card">
 
-		<div class="mb-0">
-			<div class="dropdown pull-right">
-				<svg class="icon icon-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<use href="#icon-dot-horizontal"></use>
+			<div class="mb-0">
+				<div class="dropdown pull-right">
+					<svg class="icon icon-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<use href="#icon-dot-horizontal"></use>
+					</svg>
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+						{% if class.owner == frappe.session.user %}
+						<li>
+							<a class="dropdown-item small" href="{{ class.start_url }}"> {{ _("Start") }} </a>
+						</li>
+						{% endif %}
+						{% if is_student %}
+						<li>
+							<a class="dropdown-item small" href="{{ class.join_url }}"> {{ _("Join") }} </a>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
+				<div class="bold-heading mb-4">
+					{{ class.title }}
+				</div>
+			</div>
+			<div>
+				<svg class="icon icon-sm">
+					<use href="#icon-calendar"></use>
 				</svg>
-				<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					{% if class.owner == frappe.session.user %}
-					<li>
-						<a class="dropdown-item small" href="{{ class.start_url }}"> {{ _("Start") }} </a>
-					</li>
-					{% endif %}
-					{% if is_student %}
-					<li>
-						<a class="dropdown-item small" href="{{ class.join_url }}"> {{ _("Join") }} </a>
-					</li>
-					{% endif %}
-
-				</ul>
+				{{ frappe.utils.format_date(class.date, "full") }}
 			</div>
-			<div class="lms-card-title mb-4">
-				{{ class.title }}
+			<div>
+				<svg class="icon icon-sm">
+					<use href="#icon-clock"></use>
+				</svg>
+				{{ frappe.utils.format_time(class.time, "hh:mm a") }}
 			</div>
-		</div>
-		<div>
-			<svg class="icon icon-sm">
-				<use href="#icon-calendar"></use>
-			</svg>
-			{{ frappe.utils.format_date(class.date, "full") }}
-		</div>
-		<div>
-			<svg class="icon icon-sm">
-				<use href="#icon-clock"></use>
-			</svg>
-			{{ frappe.utils.format_time(class.time, "hh:mm a") }}
-		</div>
 
-		<div class="mt-4">
-			{{ class.description }}
-		</div>
+			<div class="mt-4">
+				{{ class.description }}
+			</div>
 
-	</div>
+		</div>
 	{% endfor %}
 	{% else %}
-	<p class=""> {{ _("No Live Classes") }} </p>
+		<p class=""> {{ _("No Live Classes") }} </p>
 	{% endif %}
 </div>
 {% endmacro %}
 
 {%- block script %}
-    {{ super() }}
+	{{ super() }}
 	{% if is_moderator %}
 	<script>
 		frappe.boot.user = {
 			"can_create": [],
-			"can_select": ["User"],
-			"can_read": ["User"]
+			"can_select": ["User", "LMS Category", "LMS Assignment", "LMS Quiz"],
+			"can_read": ["User", "LMS Category", "LMS Assignment", "LMS Quiz"]
 		};
+
+		frappe.boot.single_types = []
 
 		frappe.router = {
 			slug (name) {
@@ -334,5 +471,5 @@
 	</script>
 	{% endif %}
 
-    {{ include_script('controls.bundle.js') }}
+	{{ include_script('controls.bundle.js') }}
 {% endblock %}

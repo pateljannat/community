@@ -1,17 +1,36 @@
 <p align="center">
   <a href="https://www.frappelms.com/">
-    <img src="https://www.frappelms.com/files/flms.svg" alt="Frappe LMS" width="100" height="100">
+    <img src="https://frappelms.com/files/lms-logo-medium.png" alt="Frappe LMS" width="120px" height="25px">
   </a>
   <p align="center">Easy to use, open source, learning management system.</p>
 </p>
 
+
+&nbsp;
+
 <p align="center">
+    <a href="https://www.producthunt.com/posts/frappe-lms?utm_source=badge-top-post-topic-badge&utm_medium=badge&utm_souce=badge-frappe&#0045;lms" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-topic-badge.svg?post_id=396079&theme=dark&period=weekly&topic_id=204" alt="Frappe&#0032;LMS - Easy&#0032;to&#0032;use&#0044;&#0032;100&#0037;&#0032;open&#0032;source&#0032;learning&#0032;management&#0032;system | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+</p>
+
+
+<div align="center" style="max-height: 40px;">
+    <a href="https://frappecloud.com/lms/signup">
+        <img src=".github/try-on-f-cloud.svg" height="40">
+    </a>
+</div>
+
+&nbsp;
+
+<p align="center">
+	<a href="https://dashboard.cypress.io/projects/vandxn/runs">
+    <img alt="cypress" src="https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/vandxn/main&style=flat&logo=cypress">
+  </a>
   <a href="https://github.com/frappe/lms/blob/main/LICENSE">
     <img alt="license" src="https://img.shields.io/badge/license-AGPLv3-blue">
   </a>
 </p>
 
-<img width="1402" alt="Lesson" src="https://frappelms.com/files/fs-banner71f330.png">
+<img width="1402" alt="Lesson" src="https://frappelms.com/files/banner.png">
 
 <details>
 	<summary>Show more screenshots</summary>

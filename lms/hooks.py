@@ -180,6 +180,14 @@ website_route_rules = [
 		"to_route": "/classes/progress",
 	},
 	{"from_route": "/assignments/<assignment>", "to_route": "assignments/assignment"},
+	{
+		"from_route": "/assignment-submission/<assignment>/<submission>",
+		"to_route": "assignment_submission/assignment_submission",
+	},
+	{
+		"from_route": "/quiz-submission/<quiz>/<submission>",
+		"to_route": "quiz_submission/quiz_submission",
+	},
 ]
 
 website_redirects = [
@@ -235,6 +243,8 @@ jinja = {
 		"lms.lms.utils.get_filtered_membership",
 		"lms.lms.utils.show_start_learing_cta",
 		"lms.lms.utils.can_create_courses",
+		"lms.lms.utils.get_telemetry_boot_info",
+		"lms.lms.utils.is_onboarding_complete",
 	],
 	"filters": [],
 }

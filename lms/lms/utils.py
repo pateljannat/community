@@ -698,3 +698,58 @@ def get_course_completion_data():
 			}
 		],
 	}
+
+
+def get_telemetry_boot_info():
+	POSTHOG_PROJECT_FIELD = "posthog_project_id"
+	POSTHOG_HOST_FIELD = "posthog_host"
+
+	if not frappe.conf.get(POSTHOG_HOST_FIELD) or not frappe.conf.get(
+		POSTHOG_PROJECT_FIELD
+	):
+		return {}
+
+	return {
+		"posthog_host": frappe.conf.get(POSTHOG_HOST_FIELD),
+		"posthog_project_id": frappe.conf.get(POSTHOG_PROJECT_FIELD),
+		"enable_telemetry": 1,
+	}
+
+
+def is_onboarding_complete():
+	course_created = frappe.db.a_row_exists("LMS Course")
+	chapter_created = frappe.db.a_row_exists("Course Chapter")
+	lesson_created = frappe.db.a_row_exists("Course Lesson")
+
+	if course_created and chapter_created and lesson_created:
+		frappe.db.set_single_value("LMS Settings", "is_onboarding_complete", 1)
+
+	return {
+		"is_onboarded": frappe.db.get_single_value("LMS Settings", "is_onboarding_complete"),
+		"course_created": course_created,
+		"chapter_created": chapter_created,
+		"lesson_created": lesson_created,
+		"first_course": frappe.get_all("LMS Course", limit=1, order_by=None, pluck="name")[0]
+		if course_created
+		else None,
+	}
+
+
+def has_submitted_assessment(assessment, type, member=None):
+	if not member:
+		member = frappe.session.user
+
+	doctype = (
+		"LMS Assignment Submission" if type == "LMS Assignment" else "LMS Quiz Submission"
+	)
+	docfield = "assignment" if type == "LMS Assignment" else "quiz"
+
+	filters = {}
+	filters[docfield] = assessment
+	filters["member"] = member
+	return frappe.db.exists(doctype, filters)
+
+
+def has_graded_assessment(submission):
+	status = frappe.db.get_value("LMS Assignment Submission", submission, "status")
+	return False if status == "Not Graded" else True

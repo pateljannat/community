@@ -1,6 +1,6 @@
 {% extends "lms/templates/lms_base.html" %}
 {% block title %}
-    {{  _("All Classes") }}
+	{{  _("All Classes") }}
 {% endblock %}
 
 {% block page_content %}
@@ -8,7 +8,7 @@
 	<div class="container">
 		{{ Header() }}
 		{% if past_classes | length or upcoming_classes | length %}
-		{{ ClassTabs(past_classes, upcoming_classes) }}
+		{{ ClassTabs(past_classes, upcoming_classes, my_classes) }}
 		{% else %}
 		{{ EmptyState() }}
 		{% endif %}
@@ -27,7 +27,7 @@
 </header>
 {% endmacro %}
 
-{% macro ClassTabs(past_classes, upcoming_classes) %}
+{% macro ClassTabs(past_classes, upcoming_classes, my_classes) %}
 <article>
 	<ul class="nav lms-nav" id="courses-tab">
 
@@ -40,6 +40,7 @@
 			</a>
 		</li>
 
+		{% if is_moderator %}
 		<li class="nav-item">
 			<a class="nav-link" data-toggle="tab" href="#past">
 				{{ _("Past Classes") }}
@@ -48,6 +49,18 @@
 				</span>
 			</a>
 		</li>
+		{% endif %}
+
+		{% if frappe.session.user != "Guest" %}
+		<li class="nav-item">
+			<a class="nav-link" data-toggle="tab" href="#my-class">
+				{{ _("My Classes") }}
+				<span class="course-list-count">
+					{{ my_classes | length }}
+				</span>
+			</a>
+		</li>
+		{% endif %}
 
 	</ul>
 
@@ -58,9 +71,17 @@
 			{{ ClassCards(upcoming_classes) }}
 		</div>
 
+		{% if is_moderator %}
 		<div class="tab-pane" id="past" role="tabpanel" aria-labelledby="past">
 			{{ ClassCards(past_classes) }}
 		</div>
+		{% endif %}
+
+		{% if frappe.session.user != "Guest" %}
+		<div class="tab-pane" id="my-class" role="tabpanel" aria-labelledby="my-classes">
+			{{ ClassCards(my_classes) }}
+		</div>
+		{% endif %}
 
 	</div>
 </article>
@@ -72,36 +93,42 @@
 	{% set course_count = frappe.db.count("Class Course", {"parent": class.name}) %}
 	{% set student_count = frappe.db.count("Class Student", {"parent": class.name}) %}
 
-	<div class="lms-card">
+	<div class="common-card-style column-card" style="min-height: 150px;">
 
-		<div class="lms-card-title mb-4">
+		<div class="bold-heading">
 			{{ class.title }}
 		</div>
 
-		<!-- <div class="text-muted small mb-4">
-			{% if course_count %}
-			<span class="mr-3">
-				{{ course_count }} {{ _("Courses") }}
-			</span>
-			{% endif %}
+		{% if class.description %}
+		<div class="short-introduction">
+			{{ class.description }}
+		</div>
+		{% endif %}
 
-			{% if student_count %}
-			<span>
-				{{ student_count }} {{ _("Students") }}
-			</span>
-			{% endif %}
-		</div> -->
-
-		<div class="">
+		<div class="mt-auto mb-1">
 			<svg class="icon icon-sm">
 				<use href="#icon-calendar"></use>
 			</svg>
 			<span>
-				{{ frappe.utils.format_date(class.start_date, "long") }} -
+				{{ frappe.utils.format_date(class.start_date, "medium") }} -
 			</span>
 			<span>
-				{{ frappe.utils.format_date(class.end_date, "long") }}
+				{{ frappe.utils.format_date(class.end_date, "medium") }}
 			</span>
+		</div>
+
+		<div class="mb-1">
+			<svg class="icon icon-md">
+				<use href="#icon-education"></use>
+			</svg>
+				{{ course_count }} {{ _("Courses") }}
+		</div>
+
+		<div class="mb-1">
+			<svg class="icon icon-md">
+				<use href="#icon-users"></use>
+			</svg>
+				{{ student_count }} {{ _("Students") }}
 		</div>
 
 		<a class="stretched-link" href="/classes/{{ class.name }}"></a>
@@ -125,6 +152,17 @@
     {{ include_script('controls.bundle.js') }}
 	{% if is_moderator %}
 	<script>
+		frappe.boot.user = {
+			"can_create": [],
+			"can_select": ["LMS Category"],
+			"can_read": ["LMS Category"]
+		};
+
+		frappe.router = {
+			slug (name) {
+				return name.toLowerCase().replace(/ /g, "-");
+			}
+		}
 		let class_info = null;
 	</script>
 	{% endif %}

@@ -2,7 +2,10 @@
 	--text-3-5xl: 24px;
 	--text-3-8xl: 34px;
 	--text-4xl: 36px;
-	--checkbox-gradient: linear-gradient(180deg, #3d4142 -124.51%, var(--primary) 100%);
+}
+
+body {
+	font-size: var(--text-base);
 }
 
 .nav-link .course-list-count {
@@ -72,7 +75,7 @@
 
 .field-label {
 	color: var(--gray-900);
-	font-weight: 600;
+	font-weight: 500;
 }
 
 .field-input {
@@ -85,6 +88,14 @@
 
 .field-input:focus-visible {
 	outline: none;
+}
+
+.field-input .form-control {
+	color: initial;
+	background-color: inherit;
+	padding: 0;
+	height: inherit;
+	cursor: pointer;
 }
 
 .field-group {
@@ -106,7 +117,7 @@
 .image-preview {
 	width: 280px;
 	height: 178px;
-	border-radius: var(--border-radius-sm);
+	border-radius: var(--border-radius-md);
 	border: 1px solid var(--gray-300);
 	margin-top: 1rem;
 }
@@ -120,11 +131,11 @@ textarea.field-input {
 	border-bottom: 1px solid var(--gray-300);
 }
 
-.common-card-style .outline-lesson:last-of-type {
+.outline-lesson:last-of-type {
 	border-bottom: none;
 }
 
-.outline-lesson .level {
+.outline-lesson .level, .chapter-container .level {
 	justify-content: start;
 }
 
@@ -151,8 +162,8 @@ textarea.field-input {
 
 .lesson-editor {
 	border: 1px solid var(--gray-300);
-    border-radius: var(--border-radius-md);
-    padding-top: 0.5rem;
+	border-radius: var(--border-radius-md);
+	padding-top: 0.5rem;
 }
 
 .lesson-parent .breadcrumb {
@@ -179,6 +190,19 @@ textarea.field-input {
 .clickable:hover {
 	color: var(--gray-900);
 	text-decoration: none;
+	cursor: pointer;
+}
+
+.question-row .ql-editor.read-mode p:hover {
+	cursor: pointer;
+}
+
+.question-row .ql-editor.read-mode p {
+	display: none;
+}
+
+.question-row .ql-editor.read-mode p:first-child {
+	display: block;
 }
 
 .codex-editor path {
@@ -329,7 +353,6 @@ input[type=checkbox] {
 
 .icon {
   margin: 0;
-  margin-right: 0.25rem;
 }
 
 .lesson-links .icon {
@@ -351,8 +374,18 @@ input[type=checkbox] {
 .course-card-title {
 	font-weight: 600;
 	color: var(--gray-900);
-	margin-bottom: 1.25rem;
 	font-size: 1.125rem;
+}
+
+.short-introduction {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	margin-bottom: 1.25rem;
 }
 
 .card-divider {
@@ -460,10 +493,6 @@ input[type=checkbox] {
   color: var(--gray-700);
 }
 
-.custom-checkbox>label>input {
-  visibility: hidden;
-}
-
 .custom-checkbox>label>.empty-checkbox {
   height: 1.5rem;
   width: 1.5rem;
@@ -482,14 +511,28 @@ input[type=checkbox] {
 }
 
 .quiz-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0;
-  cursor: pointer;
+
 }
 
 .quiz-label p {
   display: inline;
+}
+
+.option-row {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	margin-bottom: 0;
+	padding: 0.75rem;
+	border: 1px solid var(--gray-200);
+	border-radius: var(--border-radius-lg);
+	cursor:pointer;
+	background-color: var(--gray-100);
+}
+
+.active-option .option-row {
+	background-color: var(--blue-50);
+	border: 1px solid var(--blue-500);
 }
 
 .course-card-wide {
@@ -651,8 +694,12 @@ input[type=checkbox] {
 }
 
 .avatar-xl {
-  width: 112px;
-  height: 112px;
+  width: 8rem;
+  height: 8rem;
+}
+
+.avatar-xl .standard-image {
+	border: 4px solid #ffffff;
 }
 
 @media (max-width: 500px) {
@@ -791,9 +838,9 @@ input[type=checkbox] {
 }
 
 .profile-banner {
-  height: 248px;
-  background-size: cover;
-  background-position: center;
+	height: 248px;
+	background-size: cover;
+	background-position: center;
 }
 
 @media (max-width: 500px) {
@@ -803,24 +850,24 @@ input[type=checkbox] {
 }
 
 .profile-info {
-  height: 90px;
-  background: #ffffff;
-  border-radius: 0px 0px 8px 8px;
-  font-size: var(--text-sm);
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2.5rem;
-  padding-left: 200px;
-  padding-right: 1rem;
-  box-shadow: var(--shadow-sm);
+	height: 90px;
+	background: #ffffff;
+	border-radius: 0px 0px 8px 8px;
+	font-size: var(--text-sm);
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 2.5rem;
+	padding-left: 200px;
+	padding-right: 1rem;
+	border: 1px solid var(--gray-300);
 }
 
 @media (max-width: 550px) {
-  .profile-info {
-	align-items: flex-end;
-	padding-left: 0;
-	height: 150px;
-  }
+	.profile-info {
+		align-items: flex-end;
+		padding-left: 0;
+		height: 150px;
+	}
 }
 
 .profile-avatar {
@@ -1041,7 +1088,7 @@ pre {
 
 .column-card {
 	flex-direction: column;
-	padding: 1.25rem;
+	padding: 1rem;
 	height: 100%;
 }
 
@@ -1348,6 +1395,10 @@ pre {
   margin: 0 1rem;
 }
 
+.seperator::after {
+	content: "\00B7";
+}
+
 .course-overlay-card {
 	background-color: white;
 	border-radius: var(--border-radius-lg);
@@ -1487,45 +1538,21 @@ pre {
 }
 
 .reviews-parent .progress-bar {
-  background-color: var(--primary-color);
+	background-color: var(--primary-color);
 }
 
 .course-home-top-container {
   position: relative;
 }
 
-.question-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.question-number {
-  padding-right: 0.25rem;
-}
-
-.option-text {
-  padding: 0.75rem;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--border-radius-md);
-  flex: 1;
-}
-
-.active-option .option-text {
-  background-color: var(--blue-50);
-  border: 1px solid var(--blue-500);
-}
-
 .question-text {
-  font-size: var(--text-lg);
-  color: var(--gray-900);
-  font-weight: 600;
-  flex: 1;
-  margin: 0 1rem;
+	margin: 0.5rem 0 1rem;
+	font-weight: 600;
 }
 
-.profile-page-body {
-  background-color: var(--gray-50);
+.question-text .ql-editor.read-mode {
+	white-space: inherit;
+	font-weight: 600;
 }
 
 .profile-column-grid {
@@ -1802,6 +1829,8 @@ li {
 }
 
 .role {
+	display: flex;
+	align-items: center;
 	margin-bottom: 0;
 	cursor: pointer;
 }
@@ -1875,8 +1904,12 @@ li {
 	padding: 0 1rem !important;
 }
 
-.modal-content {
-	font-size: var(--text-sm) !important;
+.modal-dialog-scrollable .modal-body {
+	overflow-y: unset;
+}
+
+.modal-dialog-scrollable .modal-content {
+	overflow: unset;
 }
 
 .modal-header, .modal-body {
@@ -1889,13 +1922,11 @@ li {
 
 .modal-footer {
 	padding: 0.75rem 1.5rem !important;
-	border-top: none !important;
-	background-color: var(--gray-50) !important;
 	justify-content: flex-end !important;
 }
 
-.modal-footer .btn:first-child {
-	margin-right: 0.5rem;
+.modal-footer .btn-primary {
+	margin-left: 0.5rem
 }
 
 .modal-header .modal-title {
@@ -1941,7 +1972,7 @@ select {
 }
 
 .modal-title {
-	font-size: var(--text-base) !important;
+	font-size: var(--text-lg) !important;
 }
 
 .class-form-title {
@@ -2154,4 +2185,29 @@ select {
 
 .list-row:last-child {
 	border-bottom: none;
+}
+
+.awesomplete ul li:last-child {
+	display: none;
+}
+
+.students-parent {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 150px);
+	grid-gap: 1rem;
+}
+
+.btn-remove-course {
+	opacity: 0;
+	margin-top: 0.25rem;
+}
+
+.btn-remove-course:hover {
+	opacity: 1;
+}
+
+.rows .grid-row .data-row,
+.rows .grid-row .grid-footer-toolbar,
+.grid-form-heading {
+	cursor: none;
 }

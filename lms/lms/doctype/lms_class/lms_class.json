@@ -11,16 +11,22 @@
   "title",
   "start_date",
   "end_date",
-  "paid_class",
   "column_break_4",
-  "seat_count",
-  "start_time",
   "end_time",
+  "start_time",
+  "section_break_rgfj",
+  "medium",
+  "category",
+  "column_break_flwy",
+  "seat_count",
+  "paid_class",
   "section_break_6",
   "description",
   "students",
   "courses",
-  "custom_component"
+  "custom_component",
+  "assessment_tab",
+  "assessment"
  ],
  "fields": [
   {
@@ -44,7 +50,8 @@
   {
    "fieldname": "description",
    "fieldtype": "Small Text",
-   "label": "Description"
+   "label": "Description",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_6",
@@ -96,11 +103,42 @@
    "fieldname": "end_time",
    "fieldtype": "Time",
    "label": "End Time"
+  },
+  {
+   "fieldname": "assessment_tab",
+   "fieldtype": "Tab Break",
+   "label": "Assessment"
+  },
+  {
+   "fieldname": "assessment",
+   "fieldtype": "Table",
+   "label": "Assessment",
+   "options": "LMS Assessment"
+  },
+  {
+   "fieldname": "section_break_rgfj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Online",
+   "fieldname": "medium",
+   "fieldtype": "Select",
+   "label": "Medium",
+   "options": "Online\nOffline"
+  },
+  {
+   "fieldname": "column_break_flwy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Autocomplete",
+   "label": "Category"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-03 23:07:06.725720",
+ "modified": "2023-06-22 15:57:25.190084",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Class",
