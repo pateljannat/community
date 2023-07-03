@@ -235,6 +235,7 @@ def is_certified(course):
 	return
 
 
+@frappe.whitelist()
 def get_lesson_index(lesson_name):
 	"""Returns the {chapter_index}.{lesson_index} for the lesson."""
 	lesson = frappe.db.get_value(

@@ -141,7 +141,7 @@ const parse_lesson_to_string = (data) => {
 			lesson_content +=
 				"#".repeat(block.data.level) + ` ${block.data.text}\n`;
 		} else if (block.type == "list") {
-			lesson_content += `{{ List(${block.data.items.join(",")}) }}\n`;
+			lesson_content += `{{ List(${block.data.items}) }}\n`;
 		} else if (block.type == "paragraph") {
 			lesson_content += `${block.data.text}\n`;
 		}
