@@ -802,6 +802,10 @@ input[type=checkbox] {
 	margin-top: 1.5rem;
 }
 
+.lesson-content-card a {
+	text-decoration: underline;
+}
+
 .lesson-content-card .alert-dismissible .close {
   padding: 0.5rem;
 }

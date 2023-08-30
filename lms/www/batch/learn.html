@@ -39,14 +39,14 @@
                 {% endif %}
 
                 <div class="course-details-outline">
-                    {% set classname = class_info.name if class_info else False %}
+                    {% set classname = batch_info.name if batch_info else False %}
                     {{ widgets.CourseOutline(course=course, membership=membership, lesson_page=True, classname=classname) }}
                 </div>
             </div>
             <div class="lesson-parent">
-                {{ BreadCrumb(course, lesson, class_info) }}
-                {{ LessonContent(lesson, class_info) }}
-                {% if course.status == "Approved" and not course.upcoming and not class_info %}
+                {{ BreadCrumb(course, lesson, batch_info) }}
+                {{ LessonContent(lesson, batch_info) }}
+                {% if course.status == "Approved" and not course.upcoming and not batch_info %}
                 {{ Discussions() }}
                 {% endif %}
             </div>
@@ -57,15 +57,15 @@
 
 
 <!-- BreadCrumb -->
-{% macro BreadCrumb(course, lesson, class_info) %}
+{% macro BreadCrumb(course, lesson, batch_info) %}
 <div class="breadcrumb">
-    {% if class_info %}
+    {% if batch_info %}
         <a class="dark-links" href="/courses">
             {{ _("All Batches") }}
         </a>
         <img class="ml-1 mr-1" src="/assets/lms/icons/chevron-right.svg">
-        <a class="dark-links" href="/batches/{{ class_info.name }}">
-            {{ class_info.title }}
+        <a class="dark-links" href="/batches/{{ batch_info.name }}">
+            {{ batch_info.title }}
         </a>
         <img class="ml-1 mr-1" src="/assets/lms/icons/chevron-right.svg">
         <span class="breadcrumb-destination">
@@ -89,9 +89,8 @@
 
 
 <!-- Lesson Details -->
-{% macro LessonContent(lesson, class_info) %}
+{% macro LessonContent(lesson, batch_info) %}
 {% set instructors = get_instructors(course.name) %}
-{% set is_instructor = is_instructor(course.name) %}
 
 <div>
     <div>
@@ -101,7 +100,7 @@
             {% endif %}
 
             <!-- Edit Button -->
-            {% if (is_instructor or has_course_moderator_role()) %}
+            {% if (instructor or is_moderator) %}
             <a class="btn btn-secondary btn-sm ml-2" href="{{ get_lesson_url(course.name, lesson_number) }}/edit">
                 {{ _("Edit") }}
             </a>
@@ -149,17 +148,29 @@
         {% if show_lesson %}
 
             {% if is_instructor and not lesson.include_in_preview %}
-            <div class="medium alert alert-info alert-dismissible mb-4">
+            <div class="alert alert-info alert-dismissible mb-4">
                 {{ _("This lesson is not available for preview. As you are the Instructor of the course only you can see it.") }}
                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
             </div>
             {% endif %}
 
+            {% if lesson.instructor_notes and (instructor or is_moderator or is_evaluator) %}
+            <div class="alert alert-info mb-4">
+                <div class="bold-heading mb-2">
+                    {{ _("Instructor Notes") }}
+                </div>
+                <div>
+                    {{ lesson.instructor_notes }}
+                </div>
+            </div>
+            {% endif %}
+
+
             {{ render_html(lesson) }}
 
         {% else %}
             {% set course_link = "<a class='enroll-in-course' data-course=" + course.name | urlencode + " href=''>" + _('here') +  "</a>" %}
-            <div class="alert alert-info medium mb-0">
+            <div class="alert alert-info mb-0">
                 {{ _("There is no preview available for this lesson.
                 Please join the course to access it.
                 Click {0} to enroll.").format(course_link) }}
@@ -167,7 +178,7 @@
         {% endif %}
     </div>
 
-    {% if not class_info %}
+    {% if not batch_info %}
     {{ pagination(prev_url, next_url) }}
     {% endif %}
 
