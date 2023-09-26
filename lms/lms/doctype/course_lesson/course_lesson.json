@@ -14,6 +14,10 @@
   "title",
   "include_in_preview",
   "index_label",
+  "section_break_freo",
+  "lesson_content",
+  "column_break_zhnl",
+  "instructor_notes",
   "section_break_6",
   "youtube",
   "column_break_9",
@@ -24,7 +28,6 @@
   "file_type",
   "section_break_11",
   "body",
-  "instructor_notes",
   "help_section",
   "help"
  ],
@@ -114,6 +117,7 @@
   {
    "fieldname": "section_break_16",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Assignment"
   },
   {
@@ -137,11 +141,24 @@
    "fieldname": "instructor_notes",
    "fieldtype": "Text",
    "label": "Instructor Notes"
+  },
+  {
+   "fieldname": "section_break_freo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "lesson_content",
+   "fieldtype": "Long Text",
+   "label": "Lesson Content"
+  },
+  {
+   "fieldname": "column_break_zhnl",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-31 21:47:06.314995",
+ "modified": "2023-09-26 13:17:45.741076",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "Course Lesson",

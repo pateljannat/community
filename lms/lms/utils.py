@@ -147,6 +147,7 @@ def get_lesson_details(chapter):
 				"question",
 				"file_type",
 				"instructor_notes",
+				"lesson_content",
 			],
 			as_dict=True,
 		)

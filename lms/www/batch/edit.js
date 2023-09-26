@@ -4,141 +4,99 @@ frappe.ready(() => {
 	frappe.telemetry.capture("on_lesson_creation_page", "lms");
 
 	if ($("#instructor-notes").length) {
-		frappe.require("controls.bundle.js", () => {
-			make_instructor_notes_component();
-		});
+		parse_string_to_content("notes");
 	}
 
 	if ($("#current-lesson-content").length) {
-		parse_string_to_lesson();
+		parse_string_to_content("lesson");
 	}
 
-	setup_editor();
+	setup_editor_for_lesson_content();
+	setup_editor_for_instructor_notes();
 
 	$("#save-lesson").click((e) => {
 		save_lesson(e);
 	});
 });
 
-const setup_editor = () => {
-	self.editor = new EditorJS({
+const setup_editor_for_lesson_content = () => {
+	self.lesson_editor = new EditorJS({
 		holder: "lesson-content",
-		tools: {
-			embed: {
-				class: Embed,
-				config: {
-					services: {
-						youtube: true,
-						vimeo: true,
-						codepen: true,
-						slides: {
-							regex: /https:\/\/docs\.google\.com\/presentation\/d\/e\/([A-Za-z0-9_-]+)\/pub/,
-							embedUrl:
-								"https://docs.google.com/presentation/d/e/<%= remote_id %>/embed",
-							html: "<iframe width='100%' height='300' frameborder='0' allowfullscreen='true'></iframe>",
-						},
-						pdf: {
-							regex: /(https?:\/\/.*\.pdf)/,
-							embedUrl: "<%= remote_id %>",
-							html: "<iframe width='100%' height='600px' frameborder='0'></iframe>",
-						},
-					},
-				},
-			},
-			header: {
-				class: Header,
-				inlineToolbar: ["bold", "italic", "link"],
-				config: {
-					levels: [4, 5, 6],
-					defaultLevel: 5,
-				},
-				icon: `<svg class="icon  icon-sm" style="">
-					<use class="" href="#icon-header"></use>
-				</svg>`,
-			},
-			paragraph: {
-				class: Paragraph,
-				inlineToolbar: true,
-				config: {
-					preserveBlank: true,
-				},
-			},
-			youtube: YouTubeVideo,
-			quiz: Quiz,
-			upload: Upload,
-		},
+		tools: get_tools(),
 		data: {
-			blocks: self.blocks ? self.blocks : [],
+			blocks: self.lesson_blocks ? self.lesson_blocks : [],
 		},
 	});
 };
 
-const parse_string_to_lesson = () => {
-	let lesson_content = $("#current-lesson-content").html();
-	let lesson_blocks = [];
-
-	lesson_content.split("\n").forEach((block) => {
-		if (block.includes("{{ YouTubeVideo")) {
-			let youtube_id = block.match(/'([^']+)'/)[1];
-			lesson_blocks.push({
-				type: "youtube",
-				data: {
-					youtube: youtube_id,
-				},
-			});
-		} else if (block.includes("{{ Quiz")) {
-			let quiz = block.match(/'([^']+)'/)[1];
-			lesson_blocks.push({
-				type: "quiz",
-				data: {
-					quiz: quiz,
-				},
-			});
-		} else if (block.includes("{{ Video")) {
-			let video = block.match(/'([^']+)'/)[1];
-			lesson_blocks.push({
-				type: "upload",
-				data: {
-					file_url: video,
-				},
-			});
-		} else if (block.includes("{{ Embed")) {
-			let embed = block.match(/'([^']+)'/)[1];
-			lesson_blocks.push({
-				type: "embed",
-				data: {
-					service: embed.split("|||")[0],
-					embed: embed.split("|||")[1],
-				},
-			});
-		} else if (block.includes("![]")) {
-			let image = block.match(/\((.*?)\)/)[1];
-			lesson_blocks.push({
-				type: "upload",
-				data: {
-					file_url: image,
-				},
-			});
-		} else if (block.includes("#")) {
-			let level = (block.match(/#/g) || []).length;
-			lesson_blocks.push({
-				type: "header",
-				data: {
-					text: block.replace(/#/g, "").trim(),
-					level: level,
-				},
-			});
-		} else {
-			lesson_blocks.push({
-				type: "paragraph",
-				data: {
-					text: block,
-				},
-			});
-		}
+const setup_editor_for_instructor_notes = () => {
+	self.notes_editor = new EditorJS({
+		holder: "instructor-notes",
+		tools: get_tools(),
+		data: {
+			blocks: self.note_blocks ? self.note_blocks : [],
+		},
 	});
+};
 
-	this.blocks = lesson_blocks;
+const get_tools = () => {
+	return {
+		embed: {
+			class: Embed,
+			config: {
+				services: {
+					youtube: true,
+					vimeo: true,
+					codepen: true,
+					slides: {
+						regex: /https:\/\/docs\.google\.com\/presentation\/d\/e\/([A-Za-z0-9_-]+)\/pub/,
+						embedUrl:
+							"https://docs.google.com/presentation/d/e/<%= remote_id %>/embed",
+						html: "<iframe width='100%' height='300' frameborder='0' allowfullscreen='true'></iframe>",
+					},
+					pdf: {
+						regex: /(https?:\/\/.*\.pdf)/,
+						embedUrl: "<%= remote_id %>",
+						html: "<iframe width='100%' height='600px' frameborder='0'></iframe>",
+					},
+				},
+			},
+		},
+		header: {
+			class: Header,
+			inlineToolbar: ["bold", "italic", "link"],
+			config: {
+				levels: [4, 5, 6],
+				defaultLevel: 5,
+			},
+			icon: `<svg class="icon  icon-sm" style="">
+				<use class="" href="#icon-header"></use>
+			</svg>`,
+		},
+		paragraph: {
+			class: Paragraph,
+			inlineToolbar: true,
+			config: {
+				preserveBlank: true,
+			},
+		},
+		youtube: YouTubeVideo,
+		quiz: Quiz,
+		upload: Upload,
+	};
+};
+
+const parse_string_to_content = (type) => {
+	console.log(type);
+	let content;
+	if (type == "lesson") {
+		content = $("#current-lesson-content").html();
+		this.lesson_blocks = JSON.parse(content).blocks;
+	} else {
+		console.log("else");
+		content = $("#current-instructor-notes").html();
+		this.note_blocks = JSON.parse(content).blocks;
+	}
 };
 
 const save_lesson = (e) => {
@@ -149,6 +107,8 @@ const save_lesson = (e) => {
 
 const parse_lesson_to_string = (data) => {
 	let lesson_content = "";
+	console.log(data);
+	debugger;
 	data.blocks.forEach((block) => {
 		if (block.type == "youtube") {
 			lesson_content += `{{ YouTubeVideo("${block.data.youtube}") }}\n`;
