@@ -155,6 +155,9 @@
             </div>
             {% endif %}
 
+            <div id="lesson-content"></div>
+            <div id="lesson-content-data" class="hide"> {{ lesson.lesson_content }} </div>
+
             {% if lesson.instructor_notes and (is_moderator or instructor or is_evaluator) %}
             <div class="alert alert-info mb-4">
                 <div class="bold-heading mb-2">
@@ -166,14 +169,10 @@
             </div>
             {% endif %}
 
-            {{ render_html(lesson) }}
-
         {% else %}
             {% set course_link = "<a class='enroll-in-course' data-course=" + course.name | urlencode + " href=''>" + _('here') +  "</a>" %}
             <div class="alert alert-info mb-0">
-                {{ _("There is no preview available for this lesson.
-                Please join the course to access it.
-                Click {0} to enroll.").format(course_link) }}
+                {{ _("Please enroll for the course to access this lesson. Click {0} to enroll.").format(course_link) }}
             </div>
         {% endif %}
     </div>
@@ -228,35 +227,6 @@
 {% endmacro %}
 
 
-<!-- Help Article -->
-{% macro HelpArticle() %}
-    <div class="medium">
-        <h3> {{ _("Embed Components") }} </h3>
-        <p>
-            {{ _("You can add additional content to the lesson using a special syntax. The table below mentions
-                all types of dynamic content that you can add to the lessons and the syntax for the same.") }}
-        </p>
-        <ol>
-            <li>
-                <b> {{ _("YouTube Video") }} </b>
-                <p> To get the YouTube Video ID, follow the steps mentioned below. </p>
-                <ul class="px-4">
-                    <li>
-                        {{ _("Upload the video on youtube.") }}
-                    </li>
-                    <li>
-                        {{ _("When you share a youtube video, it shows a URL") }}
-                    </li>
-                    <li>
-                        {{ _("Copy the last parameter of the URL and paste it here.") }}
-                    </li>
-                </ul>
-            </li>
-        </ol>
-    </div>
-{% endmacro %}
-
-
 <!-- Discussions Component -->
 {% macro Discussions() %}
     {% set topics_count = frappe.db.count("Discussion Topic", {
@@ -279,7 +249,6 @@
 
 {%- block script %}
     {{ super() }}
-    {{ include_script('controls.bundle.js') }}
     <script type="text/javascript">
         var page_context = {{ page_context | tojson }};
         {% include "lms/templates/quiz/quiz.js" %}
@@ -287,4 +256,8 @@
     {% for ext in page_extensions %}
     {{ ext.render_footer() }}
     {% endfor %}
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
 {%- endblock %}

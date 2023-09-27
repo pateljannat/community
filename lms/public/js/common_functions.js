@@ -416,3 +416,301 @@ const filter_courses = (e) => {
 		$(list).append(course_cards);
 	});
 };
+
+const get_tools = () => {
+	return {
+		embed: {
+			class: Embed,
+			config: {
+				services: {
+					youtube: true,
+					vimeo: true,
+					codepen: true,
+					slides: {
+						regex: /https:\/\/docs\.google\.com\/presentation\/d\/e\/([A-Za-z0-9_-]+)\/pub/,
+						embedUrl:
+							"https://docs.google.com/presentation/d/e/<%= remote_id %>/embed",
+						html: "<iframe width='100%' height='300' frameborder='0' allowfullscreen='true'></iframe>",
+					},
+					pdf: {
+						regex: /(https?:\/\/.*\.pdf)/,
+						embedUrl: "<%= remote_id %>",
+						html: "<iframe width='100%' height='600px' frameborder='0'></iframe>",
+					},
+				},
+			},
+		},
+		header: {
+			class: Header,
+			inlineToolbar: ["bold", "italic", "link"],
+			config: {
+				levels: [4, 5, 6],
+				defaultLevel: 5,
+			},
+			icon: `<svg class="icon  icon-sm" style="">
+				<use class="" href="#icon-header"></use>
+			</svg>`,
+		},
+		paragraph: {
+			class: Paragraph,
+			inlineToolbar: true,
+			config: {
+				preserveBlank: true,
+			},
+		},
+		youtube: YouTubeVideo,
+		quiz: Quiz,
+		upload: Upload,
+	};
+};
+
+class YouTubeVideo {
+	constructor({ data, api, readOnly }) {
+		this.data = data;
+		this.api = api;
+		this.readOnly = readOnly;
+	}
+
+	static get toolbox() {
+		return {
+			title: "YouTube Video",
+			icon: `<img src="/assets/lms/icons/video.svg" width="15" height="15">`,
+		};
+	}
+
+	static get isReadOnlySupported() {
+		return true;
+	}
+
+	render() {
+		this.wrapper = document.createElement("div");
+		this.wrapper.contentEditable = !this.readOnly;
+		if (this.data && this.data.youtube) {
+			$(this.wrapper).html(this.render_youtube(this.data.youtube));
+		} else {
+			this.render_youtube_dialog();
+		}
+		return this.wrapper;
+	}
+
+	render_youtube_dialog() {
+		let me = this;
+		let youtubedialog = new frappe.ui.Dialog({
+			title: __("YouTube Video"),
+			fields: [
+				{
+					fieldname: "youtube",
+					fieldtype: "Data",
+					label: __("YouTube Video ID"),
+					reqd: 1,
+				},
+				{
+					fieldname: "instructions_section_break",
+					fieldtype: "Section Break",
+					label: __("Instructions:"),
+				},
+				{
+					fieldname: "instructions",
+					fieldtype: "HTML",
+					label: __("Instructions"),
+					options: __(
+						"Enter the YouTube Video ID. The ID is the part of the URL after <code>watch?v=</code>. For example, if the URL is <code>https://www.youtube.com/watch?v=QH2-TGUlwu4</code>, the ID is <code>QH2-TGUlwu4</code>"
+					),
+				},
+			],
+			primary_action_label: __("Insert"),
+			primary_action(values) {
+				youtubedialog.hide();
+				me.youtube = values.youtube;
+				$(me.wrapper).html(me.render_youtube(values.youtube));
+			},
+		});
+		youtubedialog.show();
+	}
+
+	render_youtube(youtube) {
+		return `<iframe width="100%" height="400"
+			src="https://www.youtube.com/embed/${youtube}"
+			title="YouTube video player"
+			frameborder="0"
+			style="border-radius: var(--border-radius-lg); margin: 1rem 0;"
+			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+			allowfullscreen>
+		</iframe>`;
+	}
+
+	validate(savedData) {
+		return !savedData.youtube || !savedData.youtube.trim() ? false : true;
+	}
+
+	save(block_content) {
+		return {
+			youtube: this.data.youtube || this.youtube,
+		};
+	}
+}
+
+class Quiz {
+	static get toolbox() {
+		return {
+			title: "Quiz",
+			icon: `<img src="/assets/lms/icons/quiz.svg" width="15" height="15">`,
+		};
+	}
+
+	static get isReadOnlySupported() {
+		return true;
+	}
+
+	constructor({ data, api, readOnly }) {
+		this.data = data;
+		this.api = api;
+		this.readOnly = readOnly;
+	}
+
+	render() {
+		this.wrapper = document.createElement("div");
+		this.wrapper.contentEditable = !this.readOnly;
+		if (this.data && this.data.quiz) {
+			$(this.wrapper).html(this.render_quiz(this.data.quiz));
+		} else {
+			this.render_quiz_dialog();
+		}
+	}
+
+	render_quiz_dialog() {
+		let me = this;
+		let quizdialog = new frappe.ui.Dialog({
+			title: __("Manage Quiz"),
+			fields: [
+				{
+					fieldname: "quiz",
+					fieldtype: "Link",
+					label: __("Quiz"),
+					options: "LMS Quiz",
+					only_select: 1,
+				},
+			],
+			primary_action_label: __("Insert"),
+			primary_action(values) {
+				me.quiz = values.quiz;
+				quizdialog.hide();
+				$(me.wrapper).html(me.render_quiz(me.quiz));
+			},
+			secondary_action_label: __("Create New"),
+			secondary_action: () => {
+				window.location.href = `/quizzes`;
+			},
+		});
+		quizdialog.show();
+		setTimeout(() => {
+			$(".modal-body").css("min-height", "200px");
+			$(".modal-body input").focus();
+		}, 1000);
+	}
+
+	render_quiz(quiz) {
+		let me = this;
+		if (this.readOnly) {
+			frappe.call({
+				method: "lms.plugins.quiz_renderer",
+				args: {
+					quiz_name: quiz,
+				},
+				callback: (data) => {
+					return $(me.wrapper).html(data.message);
+				},
+			});
+		} else {
+			return `<div class="common-card-style p-2 my-2 bold-heading">
+				Quiz: ${quiz}
+			</div>`;
+		}
+	}
+
+	validate(savedData) {
+		return !savedData.quiz || !savedData.quiz.trim() ? false : true;
+	}
+
+	save(block_content) {
+		return {
+			quiz: this.data.quiz || this.quiz,
+		};
+	}
+}
+
+class Upload {
+	static get toolbox() {
+		return {
+			title: "Upload",
+			icon: `<img src="/assets/lms/icons/upload.svg" width="15" height="15">`,
+		};
+	}
+
+	static get isReadOnlySupported() {
+		return true;
+	}
+
+	constructor({ data, api, readOnly }) {
+		this.data = data;
+		this.api = api;
+		this.readOnly = readOnly;
+	}
+
+	render() {
+		this.wrapper = document.createElement("div");
+		this.wrapper.contentEditable = !this.readOnly;
+		if (this.data && this.data.file_url) {
+			$(this.wrapper).html(this.render_upload(this.data.file_url));
+		} else {
+			this.render_upload_dialog();
+		}
+		return this.wrapper;
+	}
+
+	render_upload_dialog() {
+		let self = this;
+		new frappe.ui.FileUploader({
+			disable_file_browser: true,
+			folder: "Home/Attachments",
+			make_attachments_public: true,
+			restrictions: {
+				allowed_file_types: ["image/*", "video/*"],
+			},
+			on_success: (file_doc) => {
+				self.file_url = file_doc.file_url;
+				$(self.wrapper).html(self.render_upload(self.file_url));
+			},
+		});
+	}
+
+	render_upload(url) {
+		this.is_video = is_video(url);
+		if (this.is_video) {
+			return `<video controls width='100%'>
+				<source src=${encodeURI(url)} type='video/mp4'>
+			</video>`;
+		} else {
+			return `<img src=${encodeURI(url)} width='100%'>`;
+		}
+	}
+
+	validate(savedData) {
+		return !savedData.file_url || !savedData.file_url.trim() ? false : true;
+	}
+
+	save(block_content) {
+		return {
+			file_url: this.data.file_url || this.file_url,
+			is_video: this.is_video,
+		};
+	}
+}
+
+const is_video = (url) => {
+	let video_types = ["mov", "mp4", "mkv"];
+	let video_extension = url.split(".").pop();
+	return video_types.indexOf(video_extension) >= 0;
+};
+
+frappe.get_tools = get_tools;

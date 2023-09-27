@@ -102,12 +102,14 @@ def set_mandatory_fields_for_profile():
 	profile_form.save()
 
 
+@frappe.whitelist()
 def quiz_renderer(quiz_name):
 	if frappe.session.user == "Guest":
-		return " <div class='alert alert-info'>" + _(
-			"Quiz is not available to Guest users. Please login to continue."
+		return (
+			" <div class='alert alert-info'>"
+			+ _("Quiz is not available to Guest users. Please login to continue.")
+			+ "</div>"
 		)
-		+"</div>"
 
 	quiz = frappe.get_doc("LMS Quiz", quiz_name)
 	no_of_attempts = frappe.db.count(

@@ -2,11 +2,14 @@ frappe.ready(() => {
 	this.marked_as_complete = false;
 	let self = this;
 
+	frappe.require("controls.bundle.js");
 	frappe.telemetry.capture("on_lesson_page", "lms");
-
 	fetch_assignments();
-
 	save_current_lesson();
+
+	if ($("#lesson-content").length) {
+		setup_lesson_content();
+	}
 
 	$(window).scroll(() => {
 		let self = this;
@@ -248,6 +251,18 @@ const fetch_assignments = () => {
 					.siblings(".preview-work")
 					.attr("data-submission", assignment.name);
 			}
+		},
+	});
+};
+
+const setup_lesson_content = () => {
+	let content = JSON.parse($("#lesson-content-data").html()).blocks;
+	self.lesson_editor = new EditorJS({
+		holder: "lesson-content",
+		tools: frappe.get_tools(),
+		readOnly: true,
+		data: {
+			blocks: content || [],
 		},
 	});
 };
