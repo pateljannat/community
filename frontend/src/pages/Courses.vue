@@ -26,83 +26,85 @@
 					</router-link>
 				</div>
 			</header>
-			<div class="">
-				<div
-					v-if="courses.data.length == 0 && courses.list.loading"
-					class="p-5 text-base text-gray-700"
-				>
-					Loading Courses...
-				</div>
-				<Tabs
-					v-else
-					v-model="tabIndex"
-					:tabs="tabs"
-					tablistClass="overflow-x-visible"
-				>
-					<template #tab="{ tab, selected }">
-						<div>
-							<button
-								class="group -mb-px flex items-center gap-2 overflow-hidden border-b border-transparent py-2.5 text-base text-gray-600 duration-300 ease-in-out hover:border-gray-400 hover:text-gray-900"
-								:class="{ 'text-gray-900': selected }"
+			<ClientOnly>
+				<div class="">
+					<div
+						v-if="courses.data.length == 0 && courses.list.loading"
+						class="p-5 text-base text-gray-700"
+					>
+						Loading Courses...
+					</div>
+					<Tabs
+						v-else
+						v-model="tabIndex"
+						:tabs="tabs"
+						tablistClass="overflow-x-visible"
+					>
+						<template #tab="{ tab, selected }">
+							<div>
+								<button
+									class="group -mb-px flex items-center gap-2 overflow-hidden border-b border-transparent py-2.5 text-base text-gray-600 duration-300 ease-in-out hover:border-gray-400 hover:text-gray-900"
+									:class="{ 'text-gray-900': selected }"
+								>
+									<component v-if="tab.icon" :is="tab.icon" class="h-5" />
+									{{ __(tab.label) }}
+									<Badge theme="gray">
+										{{ tab.count }}
+									</Badge>
+								</button>
+							</div>
+						</template>
+						<template #default="{ tab }">
+							<div
+								v-if="tab.courses && tab.courses.value.length"
+								class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 my-5 mx-5"
 							>
-								<component v-if="tab.icon" :is="tab.icon" class="h-5" />
-								{{ __(tab.label) }}
-								<Badge theme="gray">
-									{{ tab.count }}
-								</Badge>
-							</button>
-						</div>
-					</template>
-					<template #default="{ tab }">
-						<div
-							v-if="tab.courses && tab.courses.value.length"
-							class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 my-5 mx-5"
-						>
-							<router-link
-								v-for="course in tab.courses.value"
-								:to="
-									course.membership && course.current_lesson
-										? {
-												name: 'Lesson',
-												params: {
-													courseName: course.name,
-													chapterNumber: course.current_lesson.split('.')[0],
-													lessonNumber: course.current_lesson.split('.')[1],
-												},
-										  }
-										: course.membership
-										? {
-												name: 'Lesson',
-												params: {
-													courseName: course.name,
-													chapterNumber: 1,
-													lessonNumber: 1,
-												},
-										  }
-										: {
-												name: 'CourseDetail',
-												params: { courseName: course.name },
-										  }
-								"
+								<router-link
+									v-for="course in tab.courses.value"
+									:to="
+										course.membership && course.current_lesson
+											? {
+													name: 'Lesson',
+													params: {
+														courseName: course.name,
+														chapterNumber: course.current_lesson.split('.')[0],
+														lessonNumber: course.current_lesson.split('.')[1],
+													},
+											  }
+											: course.membership
+											? {
+													name: 'Lesson',
+													params: {
+														courseName: course.name,
+														chapterNumber: 1,
+														lessonNumber: 1,
+													},
+											  }
+											: {
+													name: 'CourseDetail',
+													params: { courseName: course.name },
+											  }
+									"
+								>
+									<CourseCard :course="course" />
+								</router-link>
+							</div>
+							<div
+								v-else
+								class="grid flex-1 place-items-center text-xl font-medium text-gray-500"
 							>
-								<CourseCard :course="course" />
-							</router-link>
-						</div>
-						<div
-							v-else
-							class="grid flex-1 place-items-center text-xl font-medium text-gray-500"
-						>
-							<div class="flex flex-col items-center justify-center mt-4">
-								<div>
-									{{
-										__('No {0} courses found').format(tab.label.toLowerCase())
-									}}
+								<div class="flex flex-col items-center justify-center mt-4">
+									<div>
+										{{
+											__('No {0} courses found').format(tab.label.toLowerCase())
+										}}
+									</div>
 								</div>
 							</div>
-						</div>
-					</template>
-				</Tabs>
-			</div>
+						</template>
+					</Tabs>
+				</div>
+			</ClientOnly>
 		</div>
 	</div>
 </template>
@@ -110,6 +112,7 @@
 <script setup>
 import { createListResource, Breadcrumbs, Tabs, Badge, Button } from 'frappe-ui'
 import CourseCard from '@/components/CourseCard.vue'
+import ClientOnly from '@/components/ClientOnly.vue'
 import { Plus } from 'lucide-vue-next'
 import { ref, computed, inject } from 'vue'
 

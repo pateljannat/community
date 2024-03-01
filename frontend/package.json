@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node server",
+    "dev": "node server.js",
     "build:client": "vite build --outDir dist/client --ssrManifest",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server.js",
-    "build": "npm run build:client && npm run build:server  ",
+    "build": "npm run build:client && npm run build:server",
     "preview": "vite preview"
   },
   "dependencies": {

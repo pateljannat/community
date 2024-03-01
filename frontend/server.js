@@ -53,9 +53,7 @@ app.use('*', async (req, res) => {
 
 		const rendered = await render(url, ssrManifest)
 
-		const html = template
-			.replace(`<!--app-head-->`, rendered.head ?? '')
-			.replace(`<!--app-html-->`, rendered.html ?? '')
+		const html = template.replace(`<!--ssr-outlet-->`, rendered.head ?? '')
 
 		res.status(200).set({ 'Content-Type': 'text/html' }).send(html)
 	} catch (e) {
