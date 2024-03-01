@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createMemoryHistory } from 'vue-router'
 import { usersStore } from './stores/user'
 import { sessionStore } from './stores/session'
 
@@ -86,7 +86,9 @@ const routes = [
 ]
 
 let router = createRouter({
-	history: createWebHistory('/'),
+	history: import.meta.env.SSR
+		? createMemoryHistory('/')
+		: createWebHistory('/'),
 	routes,
 })
 

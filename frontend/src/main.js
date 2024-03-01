@@ -1,6 +1,6 @@
 import './index.css'
 
-import { createApp } from 'vue'
+import { createSSRApp } from 'vue'
 import router from './router'
 import App from './App.vue'
 import { createPinia } from 'pinia'
@@ -17,21 +17,23 @@ import {
 	pageMetaPlugin,
 } from 'frappe-ui'
 
-let pinia = createPinia()
-let app = createApp(App)
-setConfig('resourceFetcher', frappeRequest)
+export function createApp() {
+	let pinia = createPinia()
+	const app = createSSRApp(App)
+	setConfig('resourceFetcher', frappeRequest)
 
-app.use(FrappeUI)
-app.use(pinia)
-app.use(router)
-app.use(translationPlugin)
-app.use(pageMetaPlugin)
-app.provide('$dayjs', dayjs)
-app.provide('$socket', initSocket())
-app.mount('#app')
+	app.use(FrappeUI)
+	app.use(pinia)
+	app.use(router)
+	app.use(translationPlugin)
+	app.use(pageMetaPlugin)
+	app.provide('$dayjs', dayjs)
+	app.provide('$socket', initSocket())
 
-const { userResource } = usersStore()
-let { isLoggedIn } = sessionStore()
+	const { userResource } = usersStore()
+	let { isLoggedIn } = sessionStore()
 
-app.provide('$user', userResource)
-app.config.globalProperties.$user = userResource
+	app.provide('$user', userResource)
+	app.config.globalProperties.$user = userResource
+	return { app }
+}
