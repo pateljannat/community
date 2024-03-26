@@ -20,7 +20,6 @@ const routes = [
 		props: true,
 	},
 	{
-		// Create a route for path /courses/inventory-management/learn/1.1
 		path: '/courses/:courseName/learn/:chapterNumber-:lessonNumber',
 		name: 'Lesson',
 		component: () => import('@/pages/Lesson.vue'),
@@ -78,17 +77,27 @@ const routes = [
 		props: true,
 	},
 	{
-		path: '/courses/:courseName/outline',
-		name: 'CourseOutline',
-		component: () => import('@/pages/CreateOutline.vue'),
+		path: '/courses/:courseName/learn/:chapterNumber-:lessonNumber/edit',
+		name: 'CreateLesson',
+		component: () => import('@/pages/CreateLesson.vue'),
+		props: true,
+	},
+	{
+		path: '/batches/:batchName/edit',
+		name: 'BatchCreation',
+		component: () => import('@/pages/BatchCreation.vue'),
+		props: true,
+	},
+	{
+		path: '/job-opening/:jobName/edit',
+		name: 'JobCreation',
+		component: () => import('@/pages/JobCreation.vue'),
 		props: true,
 	},
 ]
 
 let router = createRouter({
-	history: import.meta.env.SSR
-		? createMemoryHistory('/')
-		: createWebHistory('/'),
+	history: createWebHistory('/learning'),
 	routes,
 })
 

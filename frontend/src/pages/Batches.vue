@@ -8,15 +8,29 @@
 				:items="[{ label: __('All Batches'), route: { name: 'Batches' } }]"
 			/>
 			<div class="flex">
-				<Button variant="solid">
-					<template #prefix>
-						<Plus class="h-4 w-4" />
-					</template>
-					{{ __('New Batch') }}
-				</Button>
+				<router-link
+					v-if="user.data"
+					:to="{
+						name: 'BatchCreation',
+						params: { batchName: 'new' },
+					}"
+				>
+					<Button variant="solid">
+						<template #prefix>
+							<Plus class="h-4 w-4" />
+						</template>
+						{{ __('New Batch') }}
+					</Button>
+				</router-link>
 			</div>
 		</header>
-		<div class="pb-5">
+		<div v-if="batches.data" class="pb-5">
+			<div
+				v-if="batches.data.length == 0 && batches.list.loading"
+				class="p-5 text-base text-gray-700"
+			>
+				{{ __('Loading Batches...') }}
+			</div>
 			<Tabs v-model="tabIndex" :tabs="tabs" tablistClass="overflow-x-visible">
 				<template #tab="{ tab, selected }">
 					<div>
@@ -69,13 +83,15 @@
 	</div>
 </template>
 <script setup>
-import { createResource, Breadcrumbs, Button, Tabs, Badge } from 'frappe-ui'
+import { createListResource, Breadcrumbs, Button, Tabs, Badge } from 'frappe-ui'
 import { Plus } from 'lucide-vue-next'
 import BatchCard from '@/components/BatchCard.vue'
 import { inject, ref, computed } from 'vue'
 
 const user = inject('$user')
-const batches = createResource({
+
+const batches = createListResource({
+	doctype: 'LMS Batch',
 	url: 'lms.lms.utils.get_batches',
 	cache: ['batches', user?.data?.email],
 	auto: true,

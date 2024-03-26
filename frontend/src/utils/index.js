@@ -1,6 +1,13 @@
 import { toast } from 'frappe-ui'
-import { useDateFormat, useTimeAgo } from '@vueuse/core'
+import { useTimeAgo } from '@vueuse/core'
 import { BookOpen, Users, TrendingUp, Briefcase } from 'lucide-vue-next'
+import { Quiz } from '@/utils/quiz'
+import { Upload } from '@/utils/upload'
+import Header from '@editorjs/header'
+import Paragraph from '@editorjs/paragraph'
+import Embed from '@editorjs/embed'
+import NestedList from '@editorjs/nested-list'
+import { watch } from 'vue'
 
 export function createToast(options) {
 	toast({
@@ -62,6 +69,82 @@ export function getFileSize(file_size) {
 		return (value / 1024).toFixed(2) + 'K'
 	}
 	return value
+}
+
+export function showToast(title, text, icon) {
+	createToast({
+		title: title,
+		text: htmlToText(text),
+		icon: icon,
+		iconClasses:
+			icon == 'check'
+				? 'bg-green-600 text-white rounded-md p-px'
+				: 'bg-red-600 text-white rounded-md p-px',
+		position: icon == 'check' ? 'bottom-right' : 'top-center',
+		timeout: icon == 'check' ? 5 : 10,
+	})
+}
+
+export function updateDocumentTitle(meta) {
+	watch(
+		() => meta,
+		(meta) => {
+			if (!meta.value.title) return
+			if (meta.value.title && meta.value.subtitle) {
+				document.title = `${meta.value.title} | ${meta.value.subtitle}`
+				return
+			}
+			if (meta.value.title) {
+				document.title = `${meta.value.title}`
+				return
+			}
+		},
+		{ immediate: true, deep: true }
+	)
+}
+
+export function htmlToText(html) {
+	const div = document.createElement('div')
+	div.innerHTML = html
+	return div.textContent || div.innerText || ''
+}
+
+export function getEditorTools() {
+	return {
+		header: Header,
+		quiz: Quiz,
+		upload: Upload,
+		paragraph: {
+			class: Paragraph,
+			inlineToolbar: true,
+			config: {
+				preserveBlank: true,
+			},
+		},
+		list: {
+			class: NestedList,
+			config: {
+				defaultStyle: 'ordered',
+			},
+		},
+		embed: {
+			class: Embed,
+			inlineToolbar: false,
+			config: {
+				services: {
+					youtube: true,
+					vimeo: true,
+					codepen: true,
+					slides: {
+						regex: /https:\/\/docs\.google\.com\/presentation\/d\/e\/([A-Za-z0-9_-]+)\/pub/,
+						embedUrl:
+							'https://docs.google.com/presentation/d/e/<%= remote_id %>/embed',
+						html: "<iframe width='100%' height='300' frameborder='0' allowfullscreen='true'></iframe>",
+					},
+				},
+			},
+		},
+	}
 }
 
 export function getTimezones() {

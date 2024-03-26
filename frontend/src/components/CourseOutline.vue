@@ -1,12 +1,15 @@
 <template>
 	<div class="text-base">
 		<div
-			v-if="showHeader && outline.data?.length"
-			class="flex justify-between mb-4"
+			v-if="title && (outline.data?.length || allowEdit)"
+			class="flex items-center justify-between mb-4"
 		>
-			<div class="text-2xl font-semibold">
-				{{ __('Course Content') }}
+			<div class="font-semibold" :class="allowEdit ? 'text-base' : 'text-lg'">
+				{{ __(title) }}
 			</div>
+			<Button size="sm" v-if="allowEdit" @click="openChapterModal()">
+				{{ __('Add Chapter') }}
+			</Button>
 			<!-- <span class="font-medium cursor-pointer" @click="expandAllChapters()">
 				{{ expandAll ? __("Collapse all chapters") : __("Expand all chapters") }}
 			</span> -->
@@ -20,9 +23,9 @@
 				v-slot="{ open }"
 				v-for="(chapter, index) in outline.data"
 				:key="chapter.name"
-				:defaultOpen="openChapter(chapter.idx)"
+				:defaultOpen="openChapterDetail(chapter.idx)"
 			>
-				<DisclosureButton ref="" class="flex w-full px-2 py-4">
+				<DisclosureButton ref="" class="flex w-full px-2 py-3">
 					<ChevronRight
 						:class="{
 							'rotate-90 transform duration-200': open,
@@ -31,20 +34,16 @@
 						}"
 						class="h-4 w-4 text-gray-900 stroke-1 mr-2"
 					/>
-					<div class="text-base text-left font-medium">
+					<div class="text-base text-left font-medium leading-5">
 						{{ chapter.title }}
-					</div>
-					<div class="ml-auto text-sm">
-						{{ chapter.lessons.length }}
-						{{ chapter.lessons.length == 1 ? __('lesson') : __('lessons') }}
 					</div>
 				</DisclosureButton>
 				<DisclosurePanel class="pb-2">
 					<div v-for="lesson in chapter.lessons" :key="lesson.name">
-						<div class="outline-lesson py-2 pl-8">
+						<div class="outline-lesson pl-8 py-2">
 							<router-link
 								:to="{
-									name: 'Lesson',
+									name: allowEdit ? 'CreateLesson' : 'Lesson',
 									params: {
 										courseName: courseName,
 										chapterNumber: lesson.number.split('.')[0],
@@ -52,7 +51,7 @@
 									},
 								}"
 							>
-								<div class="flex items-center text-sm">
+								<div class="flex items-center text-sm leading-5">
 									<MonitorPlay
 										v-if="lesson.icon === 'icon-youtube'"
 										class="h-4 w-4 text-gray-900 stroke-1 mr-2"
@@ -70,13 +69,38 @@
 							</router-link>
 						</div>
 					</div>
+					<div v-if="allowEdit" class="flex mt-2 pl-8">
+						<router-link
+							:to="{
+								name: 'CreateLesson',
+								params: {
+									courseName: courseName,
+									chapterNumber: chapter.idx,
+									lessonNumber: chapter.lessons.length + 1,
+								},
+							}"
+						>
+							<Button>
+								{{ __('Add Lesson') }}
+							</Button>
+						</router-link>
+						<Button class="ml-2" @click="openChapterModal(chapter)">
+							{{ __('Edit Chapter') }}
+						</Button>
+					</div>
 				</DisclosurePanel>
 			</Disclosure>
 		</div>
 	</div>
+	<ChapterModal
+		v-model="showChapterModal"
+		v-model:outline="outline"
+		:course="courseName"
+		:chapterDetail="getCurrentChapter()"
+	/>
 </template>
 <script setup>
-import { createResource } from 'frappe-ui'
+import { Button, createResource } from 'frappe-ui'
 import { ref } from 'vue'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import {
@@ -86,9 +110,13 @@ import {
 	FileText,
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
+import ChapterModal from '@/components/Modals/ChapterModal.vue'
 
 const route = useRoute()
 const expandAll = ref(true)
+const showChapterModal = ref(false)
+const currentChapter = ref(null)
+
 const props = defineProps({
 	courseName: {
 		type: String,
@@ -98,7 +126,11 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
-	showHeader: {
+	title: {
+		type: String,
+		default: '',
+	},
+	allowEdit: {
 		type: Boolean,
 		default: false,
 	},
@@ -113,12 +145,17 @@ const outline = createResource({
 	auto: true,
 })
 
-const openChapter = (index) => {
+const openChapterDetail = (index) => {
 	return index == route.params.chapterNumber || index == 1
 }
 
-const expandAllChapters = () => {
-	expandAll.value = !expandAll.value
+const openChapterModal = (chapter = null) => {
+	currentChapter.value = chapter
+	showChapterModal.value = true
+}
+
+const getCurrentChapter = () => {
+	return currentChapter.value
 }
 </script>
 <style>

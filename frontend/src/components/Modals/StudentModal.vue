@@ -3,7 +3,7 @@
 		v-model="show"
 		:options="{
 			title: __('Add a Student'),
-			size: 'xl',
+			size: 'sm',
 			actions: [
 				{
 					label: 'Submit',

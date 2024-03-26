@@ -8,10 +8,10 @@
 					<Breadcrumbs class="h-7" :items="breadcrumbs" />
 					<div class="flex items-center">
 						<router-link
-							v-if="courseResource.doc"
+							v-if="courseResource.data"
 							:to="{
 								name: 'CourseDetail',
-								params: { courseName: courseResource.doc.name },
+								params: { courseName: courseResource.data.name },
 							}"
 						>
 							<Button>
@@ -30,7 +30,7 @@
 				<div class="mt-5 mb-10">
 					<div class="container mb-5">
 						<div class="text-lg font-semibold mb-4">
-							{{ __('Course Details') }}
+							{{ __('Details') }}
 						</div>
 						<FormControl
 							v-model="course.title"
@@ -55,14 +55,10 @@
 							/>
 						</div>
 						<FileUploader
-							v-if="!image"
+							v-if="!course.course_image"
 							:fileTypes="['image/*']"
 							:validateFile="validateFile"
-							@success="
-								(file) => {
-									image = file
-								}
-							"
+							@success="(file) => saveImage(file)"
 						>
 							<template
 								v-slot="{ file, progress, uploading, openFileSelector }"
@@ -86,10 +82,10 @@
 								</div>
 								<div class="flex flex-col">
 									<span>
-										{{ image.file_name }}
+										{{ course.course_image.file_name }}
 									</span>
 									<span class="text-sm text-gray-500 mt-1">
-										{{ getFileSize(image.file_size) }}
+										{{ getFileSize(course.course_image.file_size) }}
 									</span>
 								</div>
 								<X
@@ -104,13 +100,12 @@
 							class="mb-4"
 						/>
 						<div>
-							<div class="mb-1.5 text-sm text-gray-700">
+							<div class="mb-1.5 text-xs text-gray-600">
 								{{ __('Tags') }}
 							</div>
 							<div class="flex items-center">
 								<div
-									v-if="tags"
-									v-for="tag in tags?.split(', ')"
+									v-for="tag in course.tags.split(', ')"
 									class="flex items-center bg-gray-100 p-2 rounded-md mr-2"
 								>
 									{{ tag }}
@@ -125,7 +120,7 @@
 					</div>
 					<div class="container border-t">
 						<div class="text-lg font-semibold mt-5 mb-4">
-							{{ __('Course Settings') }}
+							{{ __('Settings') }}
 						</div>
 						<div class="flex items-center justify-between mb-5">
 							<FormControl
@@ -147,7 +142,7 @@
 					</div>
 					<div class="container border-t">
 						<div class="text-lg font-semibold mt-5 mb-4">
-							{{ __('Course Pricing') }}
+							{{ __('Pricing') }}
 						</div>
 						<div class="mb-4">
 							<FormControl
@@ -170,27 +165,14 @@
 					</div>
 				</div>
 			</div>
-			<div class="bg-gray-50 px-5 pt-5">
-				<div v-if="courseResource.doc">
-					<div class="text-xl font-semibold">
-						{{ course.title }}
-					</div>
-					<div v-if="courseResource.doc.chapters.length">
-						{{ courseResource.chapters }}
-					</div>
-					<div v-else class="border bg-white rounded-md p-5 text-center mt-4">
-						<div>
-							{{
-								__(
-									'There are no chapters in this course. Create and manage chapters from here.'
-								)
-							}}
-						</div>
-						<Button class="mt-4">
-							{{ __('Add Chapter') }}
-						</Button>
-					</div>
-				</div>
+			<div class="border-l px-5 pt-5">
+				<!-- <CreateOutline v-if="courseResource.doc" :course="courseResource.doc"/> -->
+				<CourseOutline
+					v-if="courseResource.data"
+					:courseName="courseResource.data.name"
+					:title="course.title"
+					:allowEdit="true"
+				/>
 			</div>
 		</div>
 	</div>
@@ -205,15 +187,14 @@ import {
 	FormControl,
 	FileUploader,
 } from 'frappe-ui'
-import { inject, onMounted, computed, ref } from 'vue'
-import { convertToTitleCase, createToast, getFileSize } from '../utils'
+import { inject, onMounted, computed, ref, reactive } from 'vue'
+import { convertToTitleCase, showToast, getFileSize } from '../utils'
 import Link from '@/components/Controls/Link.vue'
 import { FileText, X } from 'lucide-vue-next'
+import CourseOutline from '@/components/CourseOutline.vue'
 
 const user = inject('$user')
-const tags = ref('')
 const newTag = ref('')
-const image = ref(null)
 
 const props = defineProps({
 	courseName: {
@@ -221,33 +202,83 @@ const props = defineProps({
 	},
 })
 
-const breadcrumbs = computed(() => {
-	let crumbs = [
-		{
-			label: 'Courses',
-			route: { name: 'Courses' },
-		},
-	]
-	if (courseResource.doc) {
-		crumbs.push({
-			label: courseResource.doc?.title,
-			route: { name: 'CourseDetail', params: { courseName: props.courseName } },
-		})
-	}
-	crumbs.push({
-		label: props.courseName == 'new' ? 'New Course' : 'Edit Course',
-		route: { name: 'CreateCourse', params: { courseName: props.courseName } },
-	})
-	return crumbs
+const course = reactive({
+	title: '',
+	short_introduction: '',
+	description: '',
+	video_link: '',
+	course_image: null,
+	tags: '',
+	published: false,
+	upcoming: false,
+	disable_self_learning: false,
+	paid_course: false,
+	course_price: '',
+	currency: '',
 })
 
-const courseResource = createDocumentResource({
-	doctype: 'LMS Course',
-	name: props.courseName,
+onMounted(() => {
+	if (!user.data?.is_moderator || !user.data?.is_instructor) {
+		window.location.href = '/login'
+	}
+	if (props.courseName !== 'new') {
+		courseResource.reload()
+	}
+})
+
+const courseCreationResource = createResource({
+	url: 'frappe.client.insert',
+	makeParams(values) {
+		return {
+			doc: {
+				doctype: 'LMS Course',
+				image: course.course_image.file_url,
+				...values,
+			},
+		}
+	},
+})
+
+const courseEditResource = createResource({
+	url: 'frappe.client.set_value',
+	auto: false,
+	makeParams(values) {
+		return {
+			doctype: 'LMS Course',
+			name: values.course,
+			fieldname: {
+				image: course.course_image.file_url,
+				...course,
+			},
+		}
+	},
+})
+
+const courseResource = createResource({
+	url: 'frappe.client.get',
+	makeParams(values) {
+		return {
+			doctype: 'LMS Course',
+			name: props.courseName,
+		}
+	},
 	auto: false,
 	onSuccess(data) {
-		imageResource.reload({ image: data.image })
-		tags.value = data.tags
+		Object.keys(data).forEach((key) => {
+			if (Object.hasOwn(course, key)) course[key] = data[key]
+		})
+		let checkboxes = [
+			'published',
+			'upcoming',
+			'disable_self_learning',
+			'paid_course',
+		]
+		for (let idx in checkboxes) {
+			let key = checkboxes[idx]
+			course[key] = course[key] ? true : false
+		}
+
+		if (data.image) imageResource.reload({ image: data.image })
 	},
 })
 
@@ -260,72 +291,35 @@ const imageResource = createResource({
 	},
 	auto: false,
 	onSuccess(data) {
-		image.value = data
+		course.course_image = data
 	},
 })
 
-onMounted(() => {
-	if (!user.data?.is_moderator || !user.data?.is_instructor) {
-		window.location.href = '/login'
-	}
-	if (props.courseName !== 'new') {
-		courseResource.reload()
-	}
-})
-
-const course = computed(() => {
-	return {
-		title: courseResource.doc?.title || '',
-		short_introduction: courseResource.doc?.short_introduction || '',
-		description: courseResource.doc?.description || '',
-		video_link: courseResource.doc?.video_link || '',
-		course_image: courseResource.doc?.image || null,
-		tags: tags.value,
-		published: courseResource.doc?.published ? true : false,
-		upcoming: courseResource.doc?.upcoming ? true : false,
-		disable_self_learning: courseResource.doc?.disable_self_learning
-			? true
-			: false,
-		course_image: image.value,
-		paid_course: courseResource.doc?.paid_course ? true : false,
-		course_price: courseResource.doc?.course_price || '',
-		currency: courseResource.doc?.currency || '',
-	}
-})
-
-const courseCreationResource = createResource({
-	url: 'frappe.client.insert',
-	makeParams(values) {
-		return {
-			doc: {
-				doctype: 'LMS Course',
-				image: image.value.file_url,
-				...values,
-			},
-		}
-	},
+const getTags = computed(() => {
+	return courseResource.doc?.tags
+		? courseResource.doc.tags.split(', ')
+		: tags.value?.split(', ')
 })
 
 const submitCourse = () => {
-	if (courseResource.doc) {
-		courseResource.setValue.submit(
+	if (courseResource.data) {
+		courseEditResource.submit(
 			{
-				image: image.value?.file_url || null,
-				...course.value,
+				course: courseResource.data.name,
 			},
 			{
-				validate() {
-					return validateMandatoryFields()
+				onSuccess() {
+					showToast('Success', 'Course updated successfully', 'check')
 				},
 				onError(err) {
-					showToast(err)
+					showToast('Error', err.messages?.[0] || err, 'x')
 				},
 			}
 		)
 	} else {
-		courseCreationResource.submit(course.value, {
-			validate() {
-				return validateMandatoryFields()
+		courseCreationResource.submit(course, {
+			onSuccess() {
+				showToast('Success', 'Course created successfully', 'check')
 			},
 			onError(err) {
 				showToast(err)
@@ -343,15 +337,12 @@ const validateMandatoryFields = () => {
 		'course_image',
 	]
 	for (const field of mandatory_fields) {
-		if (!course.value[field]) {
+		if (!course[field]) {
 			let fieldLabel = convertToTitleCase(field.split('_').join(' '))
 			return `${fieldLabel} is mandatory`
 		}
 	}
-	if (
-		course.value.paid_course &&
-		(!course.value.course_price || !course.value.currency)
-	) {
+	if (course.paid_course && (!course.course_price || !course.currency)) {
 		return 'Course price and currency are mandatory for paid courses'
 	}
 }
@@ -365,32 +356,44 @@ const validateFile = (file) => {
 
 const updateTags = () => {
 	if (newTag.value) {
-		tags.value = tags.value ? `${tags.value}, ${newTag.value}` : newTag.value
+		course.tags = course.tags ? `${course.tags}, ${newTag.value}` : newTag.value
 		newTag.value = ''
 	}
 }
 
 const removeTag = (tag) => {
-	tags.value = tags.value
+	course.tags = course.tags
 		?.split(', ')
 		.filter((t) => t !== tag)
 		.join(', ')
 	newTag.value = ''
 }
 
-const showToast = (err) => {
-	createToast({
-		title: 'Error',
-		text: err.messages?.[0] || err,
-		icon: 'x',
-		iconClasses: 'bg-red-600 text-white rounded-md p-px',
-		position: 'top-center',
-		timeout: 10,
-	})
+const saveImage = (file) => {
+	course.course_image = file
 }
 
 const removeImage = () => {
-	image.value = null
-	course.value.course_image = null
+	course.course_image = null
 }
+
+const breadcrumbs = computed(() => {
+	let crumbs = [
+		{
+			label: 'Courses',
+			route: { name: 'Courses' },
+		},
+	]
+	if (courseResource.data) {
+		crumbs.push({
+			label: course.title,
+			route: { name: 'CourseDetail', params: { courseName: props.courseName } },
+		})
+	}
+	crumbs.push({
+		label: props.courseName == 'new' ? 'New Course' : 'Edit Course',
+		route: { name: 'CreateCourse', params: { courseName: props.courseName } },
+	})
+	return crumbs
+})
 </script>

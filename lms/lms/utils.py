@@ -1338,6 +1338,8 @@ def get_lesson(course, chapter, lesson):
 			"file_type",
 			"instructor_notes",
 			"course",
+			"content",
+			"instructor_content",
 		],
 		as_dict=True,
 	)
@@ -1745,3 +1747,37 @@ def get_order_summary(doctype, docname, country=None):
 
 	details.total_amount_formatted = fmt_money(details.amount, 0, details.currency)
 	return details
+
+
+@frappe.whitelist()
+def get_lesson_creation_details(course, chapter, lesson):
+	chapter_name = frappe.db.get_value(
+		"Chapter Reference", {"parent": course, "idx": chapter}, "chapter"
+	)
+	lesson_name = frappe.db.get_value(
+		"Lesson Reference", {"parent": chapter_name, "idx": lesson}, "lesson"
+	)
+
+	if lesson_name:
+		lesson_details = frappe.db.get_value(
+			"Course Lesson",
+			lesson_name,
+			[
+				"name",
+				"title",
+				"include_in_preview",
+				"body",
+				"content",
+				"instructor_notes",
+				"instructor_content",
+			],
+			as_dict=1,
+		)
+
+	return {
+		"course_title": frappe.db.get_value("LMS Course", course, "title"),
+		"chapter": frappe.db.get_value(
+			"Course Chapter", chapter_name, ["title", "name"], as_dict=True
+		),
+		"lesson": lesson_details if lesson_name else None,
+	}
