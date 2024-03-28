@@ -2,6 +2,7 @@
   "name": "frappe-ui-frontend",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "serve": "vite preview",
@@ -9,6 +10,7 @@
     "copy-html-entry": "cp ../lms/public/frontend/index.html ../lms/www/learning.html"
   },
   "dependencies": {
+    "@babel/core": "^7.24.3",
     "@editorjs/checklist": "^1.6.0",
     "@editorjs/editorjs": "^2.29.0",
     "@editorjs/embed": "^2.7.0",
@@ -16,8 +18,10 @@
     "@editorjs/image": "^2.9.0",
     "@editorjs/nested-list": "^1.4.2",
     "@editorjs/paragraph": "^2.11.3",
+    "@rollup/plugin-babel": "^6.0.4",
     "chart.js": "^4.4.1",
     "dayjs": "^1.11.6",
+    "esm": "^3.2.25",
     "feather-icons": "^4.28.0",
     "frappe-ui": "^0.1.35",
     "lucide-vue-next": "^0.309.0",
@@ -30,6 +34,8 @@
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.24.3",
+    "@rollup/plugin-babel": "^6.0.4",
     "@vitejs/plugin-vue": "^5.0.3",
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.5",

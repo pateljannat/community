@@ -1,6 +1,14 @@
 import { toast } from 'frappe-ui'
 import { useTimeAgo } from '@vueuse/core'
-import { BookOpen, Users, TrendingUp, Briefcase } from 'lucide-vue-next'
+import {
+	BookOpen,
+	Users,
+	TrendingUp,
+	Briefcase,
+	School,
+	LogIn,
+	LogOut,
+} from 'lucide-vue-next'
 import { Quiz } from '@/utils/quiz'
 import { Upload } from '@/utils/upload'
 import Header from '@editorjs/header'
@@ -294,23 +302,42 @@ export function getSidebarLinks() {
 			icon: BookOpen,
 			to: 'Courses',
 			activeFor: ['Courses', 'CourseDetail', 'Lesson'],
+			onlyMobile: false,
+			condition: true,
 		},
 		{
 			label: 'Batches',
-			icon: Users,
+			icon: School,
 			to: 'Batches',
 			activeFor: ['Batches', 'BatchDetail', 'Batch'],
+			onlyMobile: false,
+			condition: true,
 		},
 		{
 			label: 'Jobs',
 			icon: Briefcase,
 			to: 'Jobs',
 			activeFor: ['Jobs', 'JobDetail'],
+			onlyMobile: false,
+			condition: true,
 		},
 		{
 			label: 'Statistics',
 			icon: TrendingUp,
 			to: 'Statistics',
+			activeFor: ['Statistics'],
+			onlyMobile: false,
+			condition: true,
+		},
+		{
+			label: 'Log in',
+			icon: LogIn,
+			onlyMobile: true,
+		},
+		{
+			label: 'Log out',
+			icon: LogOut,
+			onlyMobile: true,
 		},
 	]
 }

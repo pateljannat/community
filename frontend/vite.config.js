@@ -19,6 +19,9 @@ export default defineConfig({
 			'@': path.resolve(__dirname, 'src'),
 		},
 	},
+	css: {
+		modules: true,
+	},
 	build: {
 		outDir: `../lms/public/frontend`,
 		emptyOutDir: true,
@@ -31,11 +34,17 @@ export default defineConfig({
 			output: {
 				manualChunks: {
 					'frappe-ui': ['frappe-ui'],
+					postcss: ['postcss'],
 				},
 			},
 		},
 	},
 	optimizeDeps: {
-		include: ['frappe-ui > feather-icons', 'showdown', 'engine.io-client'],
+		include: [
+			'frappe-ui',
+			'frappe-ui > feather-icons',
+			'showdown',
+			'engine.io-client',
+		],
 	},
 })
