@@ -311,6 +311,7 @@ lms_markdown_macro_renderers = {
 
 # page_renderer to manage profile pages
 page_renderer = [
+	"lms.ssr_page_renderer.VuePageRenderer",
 	"lms.page_renderers.ProfileRedirectPage",
 	"lms.page_renderers.ProfilePage",
 ]
