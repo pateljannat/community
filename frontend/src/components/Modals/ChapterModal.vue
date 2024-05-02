@@ -96,6 +96,7 @@ const addChapter = (close) => {
 					{
 						onSuccess(data) {
 							outline.value.reload()
+							chapter.title = ''
 							createToast({
 								text: 'Chapter added successfully',
 								icon: 'check',
