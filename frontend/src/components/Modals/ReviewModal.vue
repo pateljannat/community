@@ -19,27 +19,27 @@
 					<div class="mb-1.5 text-sm text-gray-600">
 						{{ __('Rating') }}
 					</div>
-					<Rating v-model="review.rating" />
+					<Rating v-model="review.rating" :rating_from="rating_from" />
 				</div>
 				<div>
 					<div class="mb-1.5 text-sm text-gray-600">
 						{{ __('Review') }}
 					</div>
-					<Textarea type="text" size="md" rows="5" v-model="review.review" />
+					<Textarea :rows="5" v-model="review.review" />
 				</div>
 			</div>
 		</template>
 	</Dialog>
 </template>
 <script setup>
-import { Dialog, Textarea, createResource } from 'frappe-ui'
-import { defineModel, reactive } from 'vue'
-import Rating from '@/components/Controls/Rating.vue'
+import { Dialog, Textarea, Rating, createResource } from 'frappe-ui'
+import { defineModel, reactive, ref } from 'vue'
 import { createToast } from '@/utils/'
 
 const show = defineModel()
 const reviews = defineModel('reloadReviews')
 const hasReviewed = defineModel('hasReviewed')
+const rating_from = ref(5)
 
 let review = reactive({
 	review: '',
@@ -65,8 +65,9 @@ const createReview = createResource({
 		}
 	},
 })
-function submitReview(close) {
-	review.rating = review.rating / 5
+
+const submitReview = (close) => {
+	review.rating = review.rating / rating_from.value
 	createReview.submit(review, {
 		validate() {
 			if (!review.rating) {

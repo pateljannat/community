@@ -35,16 +35,8 @@
 						<span>
 							{{ review.creation }}
 						</span>
-						<div class="flex mt-2">
-							<Star
-								v-for="index in 5"
-								class="h-5 w-5 text-gray-100 bg-gray-200 rounded-sm mr-2"
-								:class="
-									index <= Math.ceil(review.rating)
-										? 'fill-orange-500'
-										: 'fill-gray-600'
-								"
-							/>
+						<div class="flex mt-1">
+							<Rating :modelValue="Math.ceil(review.rating)" :readonly="true" />
 						</div>
 					</div>
 				</div>
@@ -62,9 +54,8 @@
 	/>
 </template>
 <script setup>
-import { Star } from 'lucide-vue-next'
-import { createResource, Button } from 'frappe-ui'
-import { computed, ref, inject } from 'vue'
+import { createResource, Button, Rating } from 'frappe-ui'
+import { ref, inject } from 'vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import ReviewModal from '@/components/Modals/ReviewModal.vue'
 

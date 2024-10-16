@@ -144,6 +144,7 @@ import {
 	Tabs,
 	Tooltip,
 	Textarea,
+	Rating
 } from 'frappe-ui'
 import {
 	User,
@@ -158,7 +159,6 @@ import {
 } from 'lucide-vue-next'
 import { inject, reactive, watch, ref, computed } from 'vue'
 import { formatTime, showToast } from '@/utils'
-import Rating from '@/components/Controls/Rating.vue'
 import Link from '@/components/Controls/Link.vue'
 
 const show = defineModel()
