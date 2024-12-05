@@ -43,6 +43,7 @@ class ProfileRedirectPage(BaseRenderer):
 	"""
 
 	def can_render(self):
+		print(self.path)
 		return self.path.startswith("profile_/")
 
 	def render(self):
@@ -59,6 +60,7 @@ class ProfilePage(BaseRenderer):
 	def can_render(self):
 		"""if "." in self.path:
 		return False"""
+		print(self.path)
 
 		# has prefix and path starts with prefix?
 		prefix = get_profile_url_prefix().lstrip("/")
@@ -115,6 +117,7 @@ class CoursePage(BaseRenderer):
 		self.renderer = None
 
 	def can_render(self):
+		print(self.path)
 		return self.path.startswith("course")
 
 	def render(self):

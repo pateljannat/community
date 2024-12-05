@@ -12,7 +12,14 @@
 				user.data?.is_instructor)
 		"
 	>
-		<iframe :src="chapter.doc.launch_file" class="w-full h-screen" />
+		<iframe
+			:srcdoc="chapter.data.launch_file_content"
+			ref="iframe"
+			@load="changeInvalidPaths"
+			class="w-full h-screen"
+		/>
+		<!-- <iframe :src="chapter.data.launch_file" class="w-full h-screen" /> -->
+		<!-- <div v-html="chapter.data.launch_file_content" class="w-full h-screen"></div> -->
 	</div>
 	<div v-else-if="!enrollment.data?.length">
 		<div class="text-center pt-10 px-5 md:px-0 pb-10">
@@ -40,13 +47,14 @@ import {
 	createListResource,
 	createResource,
 } from 'frappe-ui'
-import { computed, inject, onBeforeMount, ref } from 'vue'
+import { computed, inject, onBeforeMount, onMounted, ref } from 'vue'
 import { useSidebar } from '@/stores/sidebar'
 import { updateDocumentTitle } from '@/utils'
 
 const sidebarStore = useSidebar()
 const user = inject('$user')
 const readyToRender = ref(false)
+const iframe = ref(null)
 
 const props = defineProps({
 	courseName: {
@@ -61,6 +69,99 @@ const props = defineProps({
 
 onBeforeMount(() => {
 	sidebarStore.isSidebarCollapsed = true
+	setupSCORMAPI()
+})
+
+onMounted(() => {
+	if (props.chapterName && !props.chapterName.includes('.html')) {
+		console.log(props.chapterName)
+		chapter.submit({
+			chapterName: props.chapterName,
+		})
+	}
+})
+
+const chapter = createResource({
+	url: 'lms.lms.api.get_scorm_chapter',
+	makeParams(values) {
+		return {
+			chapter: values.chapterName,
+		}
+	},
+	cache: ['chapter', props.chapterName],
+	onSuccess(data) {
+		progress.submit()
+	},
+})
+
+const enrollment = createListResource({
+	doctype: 'LMS Enrollment',
+	fields: ['member', 'course'],
+	filters: {
+		course: props.courseName,
+		member: user.data?.name,
+	},
+	auto: true,
+	cache: ['enrollments', props.courseName, user.data?.name],
+})
+
+const getDataFromLMS = (key) => {
+	if (key == 'cmi.core.lesson_status') {
+		if (progress.data?.status == 'Complete') {
+			return 'passed'
+		}
+		return 'incomplete'
+	}
+	return ''
+}
+
+const saveDataToLMS = (key, value) => {
+	if (key == 'cmi.core.lesson_status' && value == 'passed') {
+		saveProgress()
+	}
+}
+
+const saveProgress = () => {
+	call('lms.lms.doctype.course_lesson.course_lesson.save_progress', {
+		lesson: chapter.data.lessons[0].lesson,
+		course: props.courseName,
+	})
+}
+
+const progress = createResource({
+	url: 'frappe.client.get_value',
+	makeParams(values) {
+		return {
+			doctype: 'LMS Course Progress',
+			fieldname: 'status',
+			filters: {
+				member: user.data?.name,
+				lesson: chapter.data.lessons[0].lesson,
+				chapter: chapter.data.name,
+				course: chapter.data?.course,
+			},
+		}
+	},
+	onSuccess(data) {
+		readyToRender.value = true
+	},
+})
+
+const enrollStudent = () => {
+	enrollment.insert.submit(
+		{
+			course: props.courseName,
+			member: user.data?.name,
+		},
+		{
+			onSuccess(data) {
+				window.location.reload()
+			},
+		}
+	)
+}
+
+const setupSCORMAPI = () => {
 	window.API_1484_11 = {
 		Initialize: () => 'true',
 		Terminate: () => 'true',
@@ -96,83 +197,26 @@ onBeforeMount(() => {
 		LMSGetErrorString: () => '',
 		LMSGetDiagnostic: () => '',
 	}
-})
+}
 
-const getDataFromLMS = (key) => {
-	if (key == 'cmi.core.lesson_status') {
-		if (progress.data?.status == 'Complete') {
-			return 'passed'
+const changeInvalidPaths = () => {
+	if (iframe.value) {
+		const iframeDocument = iframe.value.contentDocument
+		if (iframeDocument) {
+			// Example: Replace all 'about://' paths in the iframe's content
+			const elements = iframeDocument.querySelectorAll('[src], [href]')
+			elements.forEach((el) => {
+				const attr = el.hasAttribute('src') ? 'src' : 'href'
+				const value = el.getAttribute(attr)
+
+				if (value && value.startsWith('about://')) {
+					const basePath = chapter.data?.parent_directory // Replace with actual logic
+					const newPath = value.replace('about://', basePath)
+					el.setAttribute(attr, newPath)
+				}
+			})
 		}
-		return 'incomplete'
 	}
-	return ''
-}
-
-const saveDataToLMS = (key, value) => {
-	if (key == 'cmi.core.lesson_status' && value == 'passed') {
-		saveProgress()
-	}
-}
-
-const enrollment = createListResource({
-	doctype: 'LMS Enrollment',
-	fields: ['member', 'course'],
-	filters: {
-		course: props.courseName,
-		member: user.data?.name,
-	},
-	auto: true,
-	cache: ['enrollments', props.courseName, user.data?.name],
-})
-
-const chapter = createDocumentResource({
-	doctype: 'Course Chapter',
-	name: props.chapterName,
-	auto: true,
-	cache: ['chapter', props.chapterName],
-	onSuccess(data) {
-		progress.submit()
-	},
-})
-
-const saveProgress = () => {
-	call('lms.lms.doctype.course_lesson.course_lesson.save_progress', {
-		lesson: chapter.doc.lessons[0].lesson,
-		course: props.courseName,
-	})
-}
-
-const progress = createResource({
-	url: 'frappe.client.get_value',
-	makeParams(values) {
-		return {
-			doctype: 'LMS Course Progress',
-			fieldname: 'status',
-			filters: {
-				member: user.data?.name,
-				lesson: chapter.doc.lessons[0].lesson,
-				chapter: chapter.doc.name,
-				course: chapter.doc?.course,
-			},
-		}
-	},
-	onSuccess(data) {
-		readyToRender.value = true
-	},
-})
-
-const enrollStudent = () => {
-	enrollment.insert.submit(
-		{
-			course: props.courseName,
-			member: user.data?.name,
-		},
-		{
-			onSuccess(data) {
-				window.location.reload()
-			},
-		}
-	)
 }
 
 const breadcrumbs = computed(() => {
@@ -182,11 +226,11 @@ const breadcrumbs = computed(() => {
 			route: { name: 'Courses' },
 		},
 		{
-			label: chapter.doc?.course_title,
+			label: chapter.data?.course_title,
 			route: { name: 'CourseDetail', params: { courseName: props.courseName } },
 		},
 		{
-			label: chapter.doc?.title,
+			label: chapter.data?.title,
 		},
 	]
 })

@@ -5,6 +5,7 @@ import json
 import frappe
 import zipfile
 import os
+import re
 import shutil
 import xml.etree.ElementTree as ET
 from frappe.translate import get_all_translations
@@ -15,6 +16,7 @@ from frappe.utils import time_diff, now_datetime, get_datetime, flt
 from typing import Optional
 from lms.lms.utils import get_average_rating, get_lesson_count
 from xml.dom.minidom import parseString
+from bs4 import BeautifulSoup
 
 
 @frappe.whitelist()
@@ -981,6 +983,64 @@ def add_lesson(title, chapter, course):
 		}
 	)
 	lesson_reference.insert()
+
+
+@frappe.whitelist()
+def get_scorm_chapter(chapter):
+	print(chapter)
+	details = frappe.db.get_value(
+		"Course Chapter",
+		chapter,
+		["name", "title", "course", "course_title", "launch_file"],
+		as_dict=True,
+	)
+	print(details)
+	launch_file_path = os.path.realpath(
+		frappe.get_site_path("public", "files", details.launch_file.split("/files/")[1])
+	)
+
+	with open(launch_file_path, "rb") as file:
+		content = file.read()
+		decoded_content = content.decode("utf-8")
+		soup = BeautifulSoup(decoded_content, "html.parser")
+		formatted_html = soup.prettify()
+		parent_directory = os.path.dirname(launch_file_path).split("/public")[1]
+
+		for link in soup.find_all("link"):
+			if link.get("href"):
+				path = link.get("href")
+				print(parent_directory)
+				path = os.path.join(parent_directory, path)
+				link["href"] = path
+
+		for script in soup.find_all("script"):
+			if script.get("src"):
+				path = script.get("src")
+				path = os.path.join(parent_directory, path)
+				script["src"] = path
+
+		for img in soup.find_all("img"):
+			if img.get("src"):
+				path = img.get("src")
+				path = os.path.join(parent_directory, path)
+				img["src"] = path
+
+		for a in soup.find_all("a"):
+			if a.get("href"):
+				path = a.get("href")
+				path = os.path.join(parent_directory, path)
+				a["href"] = path
+
+		formatted_html = soup.prettify()
+		details.launch_file_content = formatted_html
+
+	lessons = frappe.get_all(
+		"Lesson Reference", {"parent": chapter}, ["lesson"], pluck="lesson"
+	)
+	details.lessons = lessons
+	details.parent_directory = parent_directory
+
+	return details
 
 
 @frappe.whitelist()
